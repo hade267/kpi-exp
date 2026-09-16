@@ -2,15 +2,9 @@ import React from 'react';
 import {
   ShieldCheck,
   Wallet,
-  CheckCircle2,
-  Users,
-  ChevronRight,
-  Menu,
   X,
   Calculator,
-  Layers,
-  Sparkles,
-  DollarSign
+  Layers
 } from 'lucide-react';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
 import { formatCurrencyVND } from '../utils/formatters';
@@ -84,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               Mục Quản Trị & Đối Soát
             </div>
 
-            <nav className="space-y-1.5">
+            <nav className="space-y-1">
               {/* Item 1: Đối Soát Nghiệm Thu EGO */}
               <button
                 id="sidebar-btn-ego-inspection"
@@ -92,63 +86,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onSelectSection('ego_inspection');
                   onCloseMobile();
                 }}
-                className={`w-full text-left p-3 rounded-xl transition-all flex items-start gap-3 group relative ${
+                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer ${
                   currentSection === 'ego_inspection'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-950/50'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                    ? 'bg-indigo-600 text-white font-semibold shadow-xs'
+                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
                 }`}
               >
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <ShieldCheck
+                    className={`w-4 h-4 shrink-0 ${
+                      currentSection === 'ego_inspection'
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-indigo-400'
+                    }`}
+                  />
+                  <span className="text-xs sm:text-sm truncate">Đối Soát Nghiệm Thu EGO</span>
+                </div>
+                <span
+                  className={`text-3xs px-2 py-0.5 rounded-full font-mono shrink-0 ml-2 ${
                     currentSection === 'ego_inspection'
                       ? 'bg-white/20 text-white'
-                      : 'bg-slate-800 text-slate-400 group-hover:text-indigo-400 group-hover:bg-slate-700'
+                      : 'bg-slate-800 text-slate-400'
                   }`}
                 >
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-bold text-sm tracking-tight truncate">
-                      Đối Soát Nghiệm Thu EGO
-                    </span>
-                    {currentSection === 'ego_inspection' && (
-                      <ChevronRight className="w-4 h-4 shrink-0 text-white/80" />
-                    )}
-                  </div>
-                  <p
-                    className={`text-2xs mt-0.5 ${
-                      currentSection === 'ego_inspection' ? 'text-indigo-100' : 'text-slate-400'
-                    }`}
-                  >
-                    Nghiệm thu Giai đoạn II • 27 nhân sự
-                  </p>
-
-                  <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                    <span
-                      className={`inline-flex items-center gap-1 text-3xs font-medium px-2 py-0.5 rounded-full ${
-                        currentSection === 'ego_inspection'
-                          ? 'bg-white/15 text-white'
-                          : 'bg-slate-800 text-emerald-400 border border-emerald-500/20'
-                      }`}
-                    >
-                      <CheckCircle2 className="w-3 h-3" />
-                      {egoPassHours.toLocaleString('vi-VN', { minimumFractionDigits: 1 })}h Pass
-                    </span>
-                    {includeUploadValid && (
-                      <span
-                        className={`text-3xs px-1.5 py-0.5 rounded ${
-                          currentSection === 'ego_inspection'
-                            ? 'bg-indigo-800 text-indigo-200'
-                            : 'bg-emerald-950 text-emerald-400'
-                        }`}
-                      >
-                        +103,55h upload
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  27 NS
+                </span>
               </button>
 
               {/* Item 2: Bảng Lương Tổng Hợp (Dữ liệu CSV) */}
@@ -158,61 +120,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onSelectSection('consolidated_salary');
                   onCloseMobile();
                 }}
-                className={`w-full text-left p-3 rounded-xl transition-all flex items-start gap-3 group relative ${
+                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer ${
                   currentSection === 'consolidated_salary'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/50'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                    ? 'bg-emerald-600 text-white font-semibold shadow-xs'
+                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
                 }`}
               >
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Wallet
+                    className={`w-4 h-4 shrink-0 ${
+                      currentSection === 'consolidated_salary'
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-emerald-400'
+                    }`}
+                  />
+                  <span className="text-xs sm:text-sm truncate">Bảng Lương Tổng Hợp</span>
+                </div>
+                <span
+                  className={`text-3xs px-2 py-0.5 rounded-full font-mono shrink-0 ml-2 ${
                     currentSection === 'consolidated_salary'
                       ? 'bg-white/20 text-white'
-                      : 'bg-slate-800 text-slate-400 group-hover:text-emerald-400 group-hover:bg-slate-700'
+                      : 'bg-slate-800 text-slate-400'
                   }`}
                 >
-                  <Wallet className="w-5 h-5" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-bold text-sm tracking-tight truncate">
-                      Bảng Lương & Tổng Hợp Công
-                    </span>
-                    {currentSection === 'consolidated_salary' && (
-                      <ChevronRight className="w-4 h-4 shrink-0 text-white/80" />
-                    )}
-                  </div>
-                  <p
-                    className={`text-2xs mt-0.5 ${
-                      currentSection === 'consolidated_salary' ? 'text-emerald-100' : 'text-slate-400'
-                    }`}
-                  >
-                    Dữ liệu CSV • VIN - EGO - NUTELLA
-                  </p>
-
-                  <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                    <span
-                      className={`inline-flex items-center gap-1 text-3xs font-medium px-2 py-0.5 rounded-full ${
-                        currentSection === 'consolidated_salary'
-                          ? 'bg-white/15 text-white'
-                          : 'bg-slate-800 text-emerald-300 border border-emerald-500/20'
-                      }`}
-                    >
-                      <Users className="w-3 h-3" />
-                      36 nhân sự
-                    </span>
-                    <span
-                      className={`text-3xs font-bold px-1.5 py-0.5 rounded font-mono ${
-                        currentSection === 'consolidated_salary'
-                          ? 'bg-emerald-800 text-white'
-                          : 'bg-slate-800 text-amber-300'
-                      }`}
-                    >
-                      104,6M VNĐ
-                    </span>
-                  </div>
-                </div>
+                  36 NS
+                </span>
               </button>
             </nav>
           </div>

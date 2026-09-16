@@ -14,18 +14,7 @@ import {
   Copy,
   Check,
   Printer,
-  Calculator,
-  Users,
-  Wallet,
-  TrendingUp,
-  Briefcase,
-  Layers,
-  ChevronDown,
-  Info,
-  ExternalLink,
-  Award,
-  Sparkles,
-  Filter
+  Award
 } from 'lucide-react';
 
 type SortColumn =
@@ -212,150 +201,12 @@ export const ConsolidatedSalaryView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title & Action Header */}
-      <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                Dữ Liệu CSV Chuẩn
-              </span>
-              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                Bảng Lương & Tổng Hợp Ngày Công
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Tổng hợp thù lao 36 nhân sự gồm KPI VIN, KPI EGO, Lương cứng VIN và Lương cứng NUTELLA
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap no-print">
-            <button
-              id="btn-copy-tsv"
-              onClick={handleCopyTSV}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border shadow-2xs cursor-pointer ${
-                copiedTSV
-                  ? 'bg-emerald-600 text-white border-emerald-600'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
-              }`}
-              title="Sao chép dạng bảng TSV để dán trực tiếp vào Microsoft Excel hoặc Google Sheets"
-            >
-              {copiedTSV ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedTSV ? 'Đã sao chép TSV' : 'Copy dán Excel'}</span>
-            </button>
-
-            <button
-              id="btn-export-csv"
-              onClick={handleExportCSV}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-2xs cursor-pointer"
-              title="Tải xuống tệp CSV có đầy đủ mã tiếng Việt UTF-8 và đơn giá"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Xuất Tệp CSV</span>
-            </button>
-
-            <button
-              id="btn-print-salary"
-              onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 transition-colors shadow-2xs cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>In Bảng Lương</span>
-            </button>
-          </div>
-        </div>
-
-        {/* 4 Core Summary Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
-          {/* Card 1: Grand Total */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 via-emerald-50/60 to-teal-50/40 border border-emerald-200">
-            <div className="flex items-center justify-between text-2xs font-bold text-emerald-800 uppercase tracking-wider">
-              <span>Tổng Lương Toàn Bộ</span>
-              <Wallet className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="mt-2 text-xl sm:text-2xl font-extrabold text-emerald-700 font-mono">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}
-            </div>
-            <div className="mt-1 text-2xs text-emerald-800/80">
-              Chi trả cho <strong>36 nhân sự</strong>
-            </div>
-          </div>
-
-          {/* Card 2: EGO KPI */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-50 via-indigo-50/60 to-blue-50/40 border border-indigo-200">
-            <div className="flex items-center justify-between text-2xs font-bold text-indigo-800 uppercase tracking-wider">
-              <span>KPI EGO (50k/h)</span>
-              <Layers className="w-4 h-4 text-indigo-600" />
-            </div>
-            <div className="mt-2 text-xl sm:text-2xl font-extrabold text-indigo-700 font-mono">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}
-            </div>
-            <div className="mt-1 text-2xs text-indigo-800/80 font-mono">
-              <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours} giờ</strong> (gồm Valid upload)
-            </div>
-          </div>
-
-          {/* Card 3: NUTELLA Fixed */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 via-amber-50/60 to-orange-50/40 border border-amber-200">
-            <div className="flex items-center justify-between text-2xs font-bold text-amber-800 uppercase tracking-wider">
-              <span>Lương Cứng NUTELLA (166k/ngày)</span>
-              <Briefcase className="w-4 h-4 text-amber-600" />
-            </div>
-            <div className="mt-2 text-xl sm:text-2xl font-extrabold text-amber-800 font-mono">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}
-            </div>
-            <div className="mt-1 text-2xs text-amber-900/80 font-mono">
-              <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella} ngày công</strong>
-            </div>
-          </div>
-
-          {/* Card 4: VIN KPI & Fixed */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-50 via-cyan-50/60 to-slate-50 border border-cyan-200">
-            <div className="flex items-center justify-between text-2xs font-bold text-cyan-800 uppercase tracking-wider">
-              <span>Dự Án VIN (KPI + Cứng)</span>
-              <TrendingUp className="w-4 h-4 text-cyan-600" />
-            </div>
-            <div className="mt-2 text-xl sm:text-2xl font-extrabold text-cyan-800 font-mono">
-              {formatCurrencyVND(
-                CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary + CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin
-              )}
-            </div>
-            <div className="mt-1 text-2xs text-cyan-900/80 font-mono">
-              {CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours}h KPI + {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin} ngày
-            </div>
-          </div>
-        </div>
-
-        {/* Pricing Policy Banner */}
-        <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-2xs">
-          <div className="flex items-center gap-2 font-bold text-slate-700">
-            <Calculator className="w-4 h-4 text-indigo-600" />
-            <span>BẢNG ĐƠN GIÁ CƠ BẢN ÁP DỤNG:</span>
-          </div>
-
-          <div className="flex items-center gap-4 flex-wrap font-mono">
-            <span className="bg-white px-2.5 py-1 rounded-md border border-slate-200 text-slate-700">
-              KPI VIN: <strong className="text-blue-700">50.000 đ/h</strong>
-            </span>
-            <span className="bg-white px-2.5 py-1 rounded-md border border-slate-200 text-slate-700">
-              KPI EGO: <strong className="text-indigo-700">50.000 đ/h</strong>
-            </span>
-            <span className="bg-white px-2.5 py-1 rounded-md border border-slate-200 text-slate-700">
-              Lương cứng NUTELLA: <strong className="text-amber-700">166.000 đ/ngày</strong>
-            </span>
-            <span className="bg-white px-2.5 py-1 rounded-md border border-slate-200 text-slate-700">
-              Lương cứng VIN: <strong className="text-cyan-700">153.000 đ/ngày</strong>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter and Search Bar */}
+    <div className="space-y-4">
+      {/* Filter, Search & Export Bar */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3 no-print">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           {/* Search */}
-          <div className="relative w-full md:w-80">
+          <div className="relative w-full lg:w-72">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -366,8 +217,8 @@ export const ConsolidatedSalaryView: React.FC = () => {
             />
           </div>
 
-          {/* Filters */}
-          <div className="flex items-center gap-1.5 flex-wrap w-full md:w-auto">
+          {/* Project Filters */}
+          <div className="flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => setFilterProject('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
@@ -418,6 +269,42 @@ export const ConsolidatedSalaryView: React.FC = () => {
             >
               <Award className="w-3 h-3" />
               Lương ≥ 4 Tr
+            </button>
+          </div>
+
+          {/* Action buttons: Copy TSV, Export CSV, Print */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              id="btn-copy-tsv"
+              onClick={handleCopyTSV}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border shadow-2xs cursor-pointer ${
+                copiedTSV
+                  ? 'bg-emerald-600 text-white border-emerald-600'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
+              }`}
+              title="Sao chép dạng bảng TSV để dán trực tiếp vào Microsoft Excel hoặc Google Sheets"
+            >
+              {copiedTSV ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedTSV ? 'Đã chép' : 'Copy Excel'}</span>
+            </button>
+
+            <button
+              id="btn-export-csv"
+              onClick={handleExportCSV}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-2xs cursor-pointer"
+              title="Tải xuống tệp CSV UTF-8 tiếng Việt"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Xuất CSV</span>
+            </button>
+
+            <button
+              id="btn-print-salary"
+              onClick={handlePrint}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 transition-colors shadow-2xs cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>In</span>
             </button>
           </div>
         </div>
