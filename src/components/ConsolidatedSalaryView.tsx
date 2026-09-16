@@ -14,7 +14,12 @@ import {
   Copy,
   Check,
   Printer,
-  Award
+  Award,
+  Wallet,
+  Clock,
+  Calendar,
+  Building2,
+  Users
 } from 'lucide-react';
 
 type SortColumn =
@@ -202,6 +207,81 @@ export const ConsolidatedSalaryView: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* 4 Summary Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 no-print">
+        {/* Card 1: Grand Total */}
+        <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xs font-bold uppercase tracking-wider text-emerald-800">
+              Tổng Ngân Sách Thực Lĩnh
+            </span>
+            <div className="text-lg sm:text-xl font-mono font-bold text-slate-900">
+              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}
+            </div>
+            <p className="text-2xs text-slate-500">
+              Chi trả đầy đủ cho <strong>{CONSOLIDATED_SALARY_TOTALS.personnelCount} nhân sự</strong>
+            </p>
+          </div>
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100">
+            <Wallet className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* Card 2: KPI EGO */}
+        <div className="bg-white rounded-2xl p-4 border border-indigo-200/80 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xs font-bold uppercase tracking-wider text-indigo-800">
+              KPI Dự Án EGO (50k/h)
+            </span>
+            <div className="text-lg sm:text-xl font-mono font-bold text-indigo-950">
+              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}
+            </div>
+            <p className="text-2xs text-slate-500">
+              Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toFixed(2)}h</strong> Pass nghiệm thu EGO
+            </p>
+          </div>
+          <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 border border-indigo-100">
+            <Clock className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* Card 3: Lương Cứng NUTELLA */}
+        <div className="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xs font-bold uppercase tracking-wider text-amber-800">
+              Lương Cứng NUTELLA (166k/công)
+            </span>
+            <div className="text-lg sm:text-xl font-mono font-bold text-amber-950">
+              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}
+            </div>
+            <p className="text-2xs text-slate-500">
+              Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toFixed(1)} ngày công</strong> dự án Nutella
+            </p>
+          </div>
+          <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 border border-amber-100">
+            <Calendar className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* Card 4: Dự Án VIN */}
+        <div className="bg-white rounded-2xl p-4 border border-cyan-200/80 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xs font-bold uppercase tracking-wider text-cyan-800">
+              Tổng Dự Án VIN (KPI + Cứng)
+            </span>
+            <div className="text-lg sm:text-xl font-mono font-bold text-cyan-950">
+              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary + CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin)}
+            </div>
+            <p className="text-2xs text-slate-500">
+              <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours.toFixed(2)}h</strong> KPI + <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin.toFixed(1)} công</strong> (153k)
+            </p>
+          </div>
+          <div className="w-11 h-11 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center flex-shrink-0 border border-cyan-100">
+            <Building2 className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+
       {/* Filter, Search & Export Bar */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3 no-print">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">

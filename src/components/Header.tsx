@@ -11,7 +11,8 @@ import {
   Wallet,
   ArrowRight
 } from 'lucide-react';
-import { formatHours } from '../utils/formatters';
+import { formatHours, formatCurrencyVND } from '../utils/formatters';
+import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
 import { MainSection } from './Sidebar';
 
 interface HeaderProps {
@@ -87,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-500">
-                    Dữ liệu CSV • 36 nhân sự • Tổng chi: 104.613.058 VNĐ
+                    Dữ liệu CSV • 36 nhân sự • Tổng chi: {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}
                   </p>
                 </div>
               </div>
@@ -190,7 +191,16 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <ListFilter className="w-4 h-4" />
-              Đối Soát Chi Tiết
+              <span>Đối Soát Chi Tiết</span>
+              <span
+                className={`text-3xs px-2 py-0.5 rounded-full font-bold ${
+                  activeTab === 'detailed'
+                    ? 'bg-amber-400 text-slate-950'
+                    : 'bg-amber-100 text-amber-800 border border-amber-300'
+                }`}
+              >
+                Đang cập nhật lại
+              </span>
             </button>
 
             <button

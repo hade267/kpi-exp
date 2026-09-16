@@ -142,6 +142,8 @@ export default function App() {
                 <DetailedReconView
                   initialPersonnelId={detailFilterPersonId}
                   onSelectPerson={handleSelectPerson}
+                  onSwitchSection={setCurrentSection}
+                  onSwitchTab={setActiveTab}
                 />
               )}
 

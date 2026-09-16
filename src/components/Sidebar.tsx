@@ -181,7 +181,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-3 border-t border-slate-800 bg-slate-950/40 text-2xs text-slate-500">
           <div className="flex items-center justify-between">
             <span>Tổng chi ngân sách</span>
-            <span className="text-white font-mono font-bold">104.613.058 đ</span>
+            <span className="text-white font-mono font-bold">
+              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}
+            </span>
           </div>
         </div>
       </aside>

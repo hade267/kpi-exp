@@ -324,7 +324,18 @@ function pickWeightedErrorDef(r: number): ErrorDefinition {
   return ERROR_DEFINITIONS.find((def) => def.code === found.code) || ERROR_DEFINITIONS[0];
 }
 
+// Trạng thái đối soát chi tiết: Đã xóa toàn bộ dữ liệu cũ và chuyển thành đang cập nhật lại
+export const DETAILED_RECON_STATUS = {
+  isUpdating: true,
+  statusLabel: 'Đang cập nhật lại',
+  description: 'Toàn bộ dữ liệu chi tiết đối soát từng bài đã được xóa khỏi hệ thống để chuẩn bị tích hợp tệp đối soát mới.',
+  clearedRecordsCount: 0,
+  updatedAt: '2026-09-16'
+};
+
 export function generatePersonnelItems(personnelId: number, includeUploadValid: boolean = true): DetailedVideoItem[] {
+  // Toàn bộ dữ liệu đối soát chi tiết đã được xóa và chuyển sang trạng thái đang cập nhật lại
+  return [];
   const person = PERSONNEL_DATA.find((p) => p.id === personnelId);
   if (!person) return [];
 
@@ -466,21 +477,6 @@ let ALL_DETAILED_ITEMS_VALID: DetailedVideoItem[] | null = null;
 let ALL_DETAILED_ITEMS_RAW: DetailedVideoItem[] | null = null;
 
 export function getAllDetailedItems(includeUploadValid: boolean = true): DetailedVideoItem[] {
-  if (includeUploadValid) {
-    if (!ALL_DETAILED_ITEMS_VALID) {
-      ALL_DETAILED_ITEMS_VALID = [];
-      PERSONNEL_DATA.forEach((p) => {
-        ALL_DETAILED_ITEMS_VALID!.push(...generatePersonnelItems(p.id, true));
-      });
-    }
-    return ALL_DETAILED_ITEMS_VALID;
-  } else {
-    if (!ALL_DETAILED_ITEMS_RAW) {
-      ALL_DETAILED_ITEMS_RAW = [];
-      PERSONNEL_DATA.forEach((p) => {
-        ALL_DETAILED_ITEMS_RAW!.push(...generatePersonnelItems(p.id, false));
-      });
-    }
-    return ALL_DETAILED_ITEMS_RAW;
-  }
+  // Toàn bộ dữ liệu đối soát chi tiết đã được xóa và chuyển sang trạng thái đang cập nhật lại
+  return [];
 }

@@ -438,13 +438,19 @@ ${allowance > 0 ? `- Phụ cấp/thưởng thêm: ${formatCurrencyVND(allowance)
             <div className="flex items-center gap-2">
               <ListFilter className="w-4 h-4 text-indigo-600" />
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Chi Tiết Đối Soát Từng Bài ({personalItems.length} video)
+                Chi Tiết Đối Soát Từng Bài {personalItems.length > 0 ? `(${personalItems.length} video)` : '(Đang cập nhật lại)'}
               </h4>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
-                {person.passCount} Pass • {person.failCount} Fail
-              </span>
+              {personalItems.length > 0 ? (
+                <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  {person.passCount} Pass • {person.failCount} Fail
+                </span>
+              ) : (
+                <span className="text-2xs font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">
+                  Đang cập nhật lại
+                </span>
+              )}
               {showDetailedList ? (
                 <ChevronUp className="w-4 h-4 text-slate-500" />
               ) : (
@@ -517,7 +523,20 @@ ${allowance > 0 ? `- Phụ cấp/thưởng thêm: ${formatCurrencyVND(allowance)
 
               {/* Scrollable list */}
               <div className="max-h-64 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100">
-                {filteredPersonalItems.length === 0 ? (
+                {personalItems.length === 0 ? (
+                  <div className="py-6 px-4 text-center space-y-1.5 bg-amber-50/40">
+                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 mx-auto">
+                      <Clock className="w-4 h-4 animate-pulse" />
+                    </div>
+                    <div className="text-xs font-bold text-slate-800">
+                      Dữ liệu đối soát chi tiết từng bài đang được cập nhật lại
+                    </div>
+                    <p className="text-2xs text-slate-500 max-w-md mx-auto">
+                      Toàn bộ dữ liệu chi tiết video cũ đã được xóa bỏ để chuẩn bị tích hợp lại tệp đối soát mới.
+                      Số giờ Pass tính công ({formatHours(person.passDurationHours)}) và lương ước tính ({formatCurrencyVND(totalSalary)}) vẫn hiển thị đầy đủ ở phần trên.
+                    </p>
+                  </div>
+                ) : filteredPersonalItems.length === 0 ? (
                   <div className="py-6 text-center text-slate-400 text-xs">
                     Không có bài đối soát nào khớp với bộ lọc.
                   </div>
