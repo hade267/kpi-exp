@@ -1,0 +1,7 @@
+{
+  "name": "Hệ Thống Kiểm Tra Đối Soát EGO",
+  "description": "Cổng tra cứu và kiểm tra đối soát số liệu nghiệm thu dự án EGO Giai đoạn II cho 27 nhân sự, chuẩn gốc và minh bạch 100%.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
