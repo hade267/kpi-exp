@@ -1,5 +1,6 @@
 import { DetailedVideoItem, ErrorStatItem } from '../types';
 import { PERSONNEL_DATA } from './reconData';
+import { UPLOAD_ISSUE_MAP } from './uploadIssueData';
 
 export const TOP_ERROR_STATS: ErrorStatItem[] = [
   {
@@ -92,6 +93,13 @@ export const TOP_ERROR_STATS: ErrorStatItem[] = [
     count: 142,
     percentage: 10.0,
     descVi: "Video hỏng cuối file, thời lượng < 5 phút, lỗi upload"
+  },
+  {
+    code: 'upload_issue',
+    category: "Lỗi tải lên hệ thống (上传问题) - Đã tính Valid",
+    count: 280,
+    percentage: 19.7,
+    descVi: "Lỗi upload / tải lên hệ thống (đã phê duyệt tính Valid cho 19 nhân sự)"
   }
 ];
 
@@ -104,6 +112,7 @@ export interface ErrorDefinition {
 
 // Common error templates with Vietnamese translation and keywords for robust matching
 export const ERROR_DEFINITIONS: ErrorDefinition[] = [
+  { code: 'upload_issue', label: 'Lỗi tải lên (上传问题) - Đã tính Valid', descVi: 'Lỗi hệ thống tải lên (đã được phê duyệt tính Valid cho 19 nhân sự)', keywords: ['上传问题', 'lỗi tải lên', 'upload', 'upload issue', 'tải lên', 'lỗi upload'] },
   { code: 'water_duration', label: 'Thủy thời lượng (水时长)', descVi: 'Kéo dài thời gian giả tạo, ít cử động, câu giờ', keywords: ['水时长', 'thủy thời lượng', 'câu giờ'] },
   { code: 'wrong_scene', label: 'Cảnh không khớp (场景不符)', descVi: 'Sai kịch bản / tải nhầm phân loại công việc', keywords: ['场景不符', 'cảnh không khớp', 'sai kịch bản'] },
   { code: 'screen_incomplete', label: 'Màn hình không đầy đủ (屏幕不全)', descVi: 'Góc máy quay bị khuất / cắt mép màn hình', keywords: ['屏幕不全', 'màn hình không đầy đủ', 'khuất màn hình'] },
@@ -132,7 +141,10 @@ export function detectErrorCode(reason?: string): string | undefined {
 
 export function matchesError(item: DetailedVideoItem, errorFilter: string): boolean {
   if (errorFilter === 'all') return true;
-  if (item.status !== 'Fail') return false;
+  if (errorFilter === 'upload_issue') {
+    return item.errorCode === 'upload_issue' || (item.errorReason?.includes('上传问题') ?? false);
+  }
+  if (item.status !== 'Fail' && item.errorCode !== 'upload_issue') return false;
   if (item.errorCode === errorFilter) return true;
 
   const def = ERROR_DEFINITIONS.find((d) => d.code === errorFilter || d.label.includes(errorFilter));
@@ -312,12 +324,18 @@ function pickWeightedErrorDef(r: number): ErrorDefinition {
   return ERROR_DEFINITIONS.find((def) => def.code === found.code) || ERROR_DEFINITIONS[0];
 }
 
-export function generatePersonnelItems(personnelId: number): DetailedVideoItem[] {
+export function generatePersonnelItems(personnelId: number, includeUploadValid: boolean = true): DetailedVideoItem[] {
   const person = PERSONNEL_DATA.find((p) => p.id === personnelId);
   if (!person) return [];
 
   const rng = seededRandom(person.id * 7919);
   const items: DetailedVideoItem[] = [];
+
+  const uploadItem = UPLOAD_ISSUE_MAP.get(person.id);
+  const uploadCount = uploadItem?.uploadCount || 0;
+  const uploadDurationSec = uploadItem?.uploadDurationSec || 0;
+  const avgUploadSec = uploadCount > 0 ? Math.floor(uploadDurationSec / uploadCount) : 0;
+  const remainderUploadSec = uploadCount > 0 ? uploadDurationSec - avgUploadSec * uploadCount : 0;
 
   const aliasKey = Object.keys(REAL_QC_SAMPLES).find((k) => person.initialAlias.includes(k) || k === person.initialAlias);
   const realList = aliasKey ? REAL_QC_SAMPLES[aliasKey] : [];
@@ -392,40 +410,77 @@ export function generatePersonnelItems(personnelId: number): DetailedVideoItem[]
     const cat = TASK_CATEGORIES[Math.floor(rng() * TASK_CATEGORIES.length)];
     const date = dates[Math.floor(rng() * dates.length)];
     const num = Math.floor(rng() * 300 + 1).toString().padStart(5, '0');
-    const sec = Math.floor(rng() * 450 + 1450);
-    const errDef = pickWeightedErrorDef(rng());
 
-    items.push({
-      id: `${person.id}-fail-${failsCreated}`,
-      personnelId: person.id,
-      personnelName: person.name,
-      alias: person.initialAlias.split(';')[0].trim(),
-      date,
-      videoCode: `${cat.prefix}_${date.replace(/-/g, '')}_task_${num}`,
-      originalFile: `C3531325${person.id.toString().padStart(4, '0')}_${date.replace(/-/g, '')}_${num.slice(-4)}`,
-      category: cat.name,
-      durationSec: sec,
-      durationFormatted: formatTime(sec),
-      status: 'Fail',
-      errorCode: errDef.code,
-      errorReason: `${errDef.label} - ${errDef.descVi}`,
-      errorCategory: errDef.label
-    });
+    // Check if this item is part of the approved upload issues for this personnel
+    const isThisUploadIssue = failsCreated <= uploadCount;
+
+    if (isThisUploadIssue) {
+      const sec = avgUploadSec + (failsCreated === uploadCount ? remainderUploadSec : 0);
+      items.push({
+        id: `${person.id}-upload-${failsCreated}`,
+        personnelId: person.id,
+        personnelName: person.name,
+        alias: person.initialAlias.split(';')[0].trim(),
+        date,
+        videoCode: `${cat.prefix}_${date.replace(/-/g, '')}_task_${num}`,
+        originalFile: `C3531325${person.id.toString().padStart(4, '0')}_${date.replace(/-/g, '')}_${num.slice(-4)}`,
+        category: cat.name,
+        durationSec: sec,
+        durationFormatted: formatTime(sec),
+        status: includeUploadValid ? 'Pass' : 'Fail',
+        errorCode: 'upload_issue',
+        errorReason: includeUploadValid
+          ? 'Lỗi tải lên (上传问题) - Đã được phê duyệt tính VALID vào giờ công'
+          : 'Lỗi tải lên hệ thống (上传问题)',
+        errorCategory: 'Lỗi tải lên (上传问题)'
+      });
+    } else {
+      const sec = Math.floor(rng() * 450 + 1450);
+      const errDef = pickWeightedErrorDef(rng());
+
+      items.push({
+        id: `${person.id}-fail-${failsCreated}`,
+        personnelId: person.id,
+        personnelName: person.name,
+        alias: person.initialAlias.split(';')[0].trim(),
+        date,
+        videoCode: `${cat.prefix}_${date.replace(/-/g, '')}_task_${num}`,
+        originalFile: `C3531325${person.id.toString().padStart(4, '0')}_${date.replace(/-/g, '')}_${num.slice(-4)}`,
+        category: cat.name,
+        durationSec: sec,
+        durationFormatted: formatTime(sec),
+        status: 'Fail',
+        errorCode: errDef.code,
+        errorReason: `${errDef.label} - ${errDef.descVi}`,
+        errorCategory: errDef.label
+      });
+    }
   }
 
   // Sort items deterministically by date and ID
   return items.sort((a, b) => a.date.localeCompare(b.date) || a.videoCode.localeCompare(b.videoCode));
 }
 
-// Precomputed master dataset for quick global queries
-let ALL_DETAILED_ITEMS: DetailedVideoItem[] | null = null;
+// Precomputed master datasets for quick global queries
+let ALL_DETAILED_ITEMS_VALID: DetailedVideoItem[] | null = null;
+let ALL_DETAILED_ITEMS_RAW: DetailedVideoItem[] | null = null;
 
-export function getAllDetailedItems(): DetailedVideoItem[] {
-  if (!ALL_DETAILED_ITEMS) {
-    ALL_DETAILED_ITEMS = [];
-    PERSONNEL_DATA.forEach((p) => {
-      ALL_DETAILED_ITEMS!.push(...generatePersonnelItems(p.id));
-    });
+export function getAllDetailedItems(includeUploadValid: boolean = true): DetailedVideoItem[] {
+  if (includeUploadValid) {
+    if (!ALL_DETAILED_ITEMS_VALID) {
+      ALL_DETAILED_ITEMS_VALID = [];
+      PERSONNEL_DATA.forEach((p) => {
+        ALL_DETAILED_ITEMS_VALID!.push(...generatePersonnelItems(p.id, true));
+      });
+    }
+    return ALL_DETAILED_ITEMS_VALID;
+  } else {
+    if (!ALL_DETAILED_ITEMS_RAW) {
+      ALL_DETAILED_ITEMS_RAW = [];
+      PERSONNEL_DATA.forEach((p) => {
+        ALL_DETAILED_ITEMS_RAW!.push(...generatePersonnelItems(p.id, false));
+      });
+    }
+    return ALL_DETAILED_ITEMS_RAW;
   }
-  return ALL_DETAILED_ITEMS;
 }

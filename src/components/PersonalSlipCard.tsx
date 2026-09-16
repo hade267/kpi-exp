@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { PersonnelRecon } from '../types';
 import { formatNumber, formatHours, formatPercent, formatSecondsToDetailed, formatCurrencyVND } from '../utils/formatters';
 import { generatePersonnelItems } from '../data/detailedReconData';
+import { UPLOAD_ISSUE_MAP } from '../data/uploadIssueData';
 import {
   Award,
   CheckCircle,
@@ -45,6 +46,7 @@ export const PersonalSlipCard: React.FC<PersonalSlipCardProps> = ({ person, onVi
   const [isCustomRate, setIsCustomRate] = useState<boolean>(false);
 
   const isTopPassHours = person.rankPassHours <= 3;
+  const uploadInfo = UPLOAD_ISSUE_MAP.get(person.id);
 
   // Salary calculations
   const baseSalary = Math.round(person.passDurationHours * hourlyRate);
@@ -79,7 +81,7 @@ export const PersonalSlipCard: React.FC<PersonalSlipCardProps> = ({ person, onVi
 - Hợp lệ tính công: ${person.validCount} bài
 - Bài Đạt (Pass): ${person.passCount} bài (${formatPercent(person.passRatePercent)})
 - Bài Lỗi (Fail): ${person.failCount} bài (${formatPercent(person.failRatePercent)})
-${person.duplicateCount > 0 ? `- Trùng lặp: ${person.duplicateCount} bài (đã trừ)\n` : ''}${person.notFoundInOriginalCount > 0 ? `- Chưa có gốc: ${person.notFoundInOriginalCount} bài (đã trừ)\n` : ''}-----------------------------
+${person.duplicateCount > 0 ? `- Trùng lặp: ${person.duplicateCount} bài (đã trừ)\n` : ''}${person.notFoundInOriginalCount > 0 ? `- Chưa có gốc: ${person.notFoundInOriginalCount} bài (đã trừ)\n` : ''}${uploadInfo ? `✨ Đã tính Valid lỗi 上传问题: +${uploadInfo.uploadCount} bài (+${formatHours(uploadInfo.uploadDurationHours)} ~ ${formatNumber(uploadInfo.uploadDurationSec)}s)\n` : ''}-----------------------------
 ⏱️ Thời lượng:
 ⭐ TG PASS TÍNH CÔNG: ${formatHours(person.passDurationHours)} (${formatNumber(person.passDurationSec)}s)
 ❌ TG Fail: ${formatHours(person.failDurationHours)} (${formatNumber(person.failDurationSec)}s)
@@ -151,6 +153,37 @@ ${allowance > 0 ? `- Phụ cấp/thưởng thêm: ${formatCurrencyVND(allowance)
 
       {/* Main Highlights Grid */}
       <div className="p-5 sm:p-6 space-y-5">
+        {/* Upload Issue Approval Banner (if applicable) */}
+        {uploadInfo && (
+          <div className="bg-gradient-to-r from-emerald-50 via-teal-50/40 to-indigo-50/30 border border-emerald-300 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-start sm:items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                    Đã Tính Valid Lỗi Tải Lên (上传问题)
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-2xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    +{uploadInfo.uploadCount} bài • +{formatHours(uploadInfo.uploadDurationHours)}
+                  </span>
+                </div>
+                <p className="text-2xs text-slate-600 mt-0.5">
+                  Nhân sự có <strong>{uploadInfo.uploadCount} video</strong> ({formatNumber(uploadInfo.uploadDurationSec)}s) bị dính lỗi kỹ thuật tải lên (上传问题) đã được phê duyệt tính là <strong>Valid (Đạt tính công)</strong> và cộng đầy đủ vào thời lượng nhận thù lao.
+                </p>
+              </div>
+            </div>
+            <div className="text-left sm:text-right sm:border-l sm:border-emerald-200 sm:pl-4 shrink-0">
+              <div className="text-2xs text-slate-500 uppercase font-semibold">Cộng thêm vào Pass</div>
+              <div className="text-base font-extrabold text-emerald-700 font-mono">
+                +{formatHours(uploadInfo.uploadDurationHours)}
+              </div>
+              <div className="text-2xs text-emerald-600 font-mono">+{formatNumber(uploadInfo.uploadDurationSec)}s</div>
+            </div>
+          </div>
+        )}
+
         {/* Core Big Metric: Pass Working Hours */}
         <div className="bg-emerald-50/60 rounded-xl p-4 sm:p-5 border border-emerald-200/80">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

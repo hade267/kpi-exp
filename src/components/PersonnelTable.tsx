@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { PersonnelRecon, ProjectSummary } from '../types';
 import { formatNumber, formatHours, formatPercent } from '../utils/formatters';
+import { UPLOAD_ISSUE_MAP } from '../data/uploadIssueData';
 import {
   Search,
   ArrowUpDown,
@@ -13,13 +14,16 @@ import {
   FileSpreadsheet,
   AlertTriangle,
   Award,
-  Filter
+  Filter,
+  Sparkles
 } from 'lucide-react';
 
 interface PersonnelTableProps {
   personnelList: PersonnelRecon[];
   projectSummary: ProjectSummary;
   onSelectPerson: (id: number) => void;
+  includeUploadValid?: boolean;
+  onOpenUploadModal?: () => void;
 }
 
 type SortField =
@@ -42,6 +46,8 @@ export const PersonnelTable: React.FC<PersonnelTableProps> = ({
   personnelList,
   projectSummary,
   onSelectPerson,
+  includeUploadValid,
+  onOpenUploadModal,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('id');
@@ -227,6 +233,18 @@ export const PersonnelTable: React.FC<PersonnelTableProps> = ({
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            {onOpenUploadModal && (
+              <button
+                id="btn-table-upload-policy"
+                onClick={onOpenUploadModal}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg transition-colors shadow-2xs cursor-pointer"
+                title="Xem bảng kê 19 nhân sự có 280 bài 上传问题 được tính Valid (+103,55h)"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Valid 上传问题 (19 NS • +103,55h)</span>
+              </button>
+            )}
+
             <button
               id="btn-copy-table"
               onClick={handleCopyTable}
@@ -390,6 +408,7 @@ export const PersonnelTable: React.FC<PersonnelTableProps> = ({
               processedPersonnel.map((person) => {
                 const isTop = person.rankPassHours <= 3;
                 const hasDeductions = person.duplicateCount > 0 || person.notFoundInOriginalCount > 0;
+                const uploadInfo = UPLOAD_ISSUE_MAP.get(person.id);
 
                 return (
                   <tr
@@ -403,7 +422,7 @@ export const PersonnelTable: React.FC<PersonnelTableProps> = ({
                     </td>
 
                     <td className="py-3 px-3 font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span>{person.name}</span>
                         {isTop && (
                           <span
@@ -421,6 +440,17 @@ export const PersonnelTable: React.FC<PersonnelTableProps> = ({
                           </span>
                         )}
                       </div>
+                      {uploadInfo && (
+                        <div className="mt-1">
+                          <span
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-3xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-300/80"
+                            title={`Đã tính Valid ${uploadInfo.uploadCount} bài lỗi 上传问题 (+${formatHours(uploadInfo.uploadDurationHours)})`}
+                          >
+                            <Sparkles className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                            <span>+{uploadInfo.uploadCount} bài 上传问题 (+{formatHours(uploadInfo.uploadDurationHours)})</span>
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     <td className="py-3 px-3 text-slate-500 text-2xs truncate max-w-[120px]" title={person.initialAlias}>
