@@ -4,12 +4,13 @@ import {
   Wallet,
   X,
   Calculator,
-  Layers
+  Layers,
+  Calendar
 } from 'lucide-react';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
 import { formatCurrencyVND } from '../utils/formatters';
 
-export type MainSection = 'ego_inspection' | 'consolidated_salary';
+export type MainSection = 'ego_inspection' | 'consolidated_salary' | 'nutella_timesheet';
 
 interface SidebarProps {
   currentSection: MainSection;
@@ -144,6 +145,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }`}
                 >
                   36 NS
+                </span>
+              </button>
+
+              {/* Item 3: Chấm Công Dự Án NUTELLA (EP / QA) */}
+              <button
+                id="sidebar-btn-nutella-timesheet"
+                onClick={() => {
+                  onSelectSection('nutella_timesheet');
+                  onCloseMobile();
+                }}
+                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer ${
+                  currentSection === 'nutella_timesheet'
+                    ? 'bg-amber-600 text-white font-semibold shadow-xs'
+                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Calendar
+                    className={`w-4 h-4 shrink-0 ${
+                      currentSection === 'nutella_timesheet'
+                        ? 'text-white'
+                        : 'text-slate-400 group-hover:text-amber-400'
+                    }`}
+                  />
+                  <span className="text-xs sm:text-sm truncate">Chấm Công NUTELLA</span>
+                </div>
+                <span
+                  className={`text-3xs px-2 py-0.5 rounded-full font-mono shrink-0 ml-2 ${
+                    currentSection === 'nutella_timesheet'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-800 text-amber-400 font-bold'
+                  }`}
+                >
+                  291.5 c
                 </span>
               </button>
             </nav>

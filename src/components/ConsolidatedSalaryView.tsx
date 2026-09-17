@@ -35,7 +35,11 @@ type SortColumn =
   | 'fixedSalaryNutella'
   | 'totalSalary';
 
-export const ConsolidatedSalaryView: React.FC = () => {
+interface ConsolidatedSalaryViewProps {
+  onSwitchSection?: (section: 'ego_inspection' | 'consolidated_salary' | 'nutella_timesheet') => void;
+}
+
+export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ onSwitchSection }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterProject, setFilterProject] = useState<'all' | 'ego' | 'vin' | 'nutella' | 'high_earner'>('all');
   const [sortCol, setSortCol] = useState<SortColumn>('stt');
@@ -246,21 +250,33 @@ export const ConsolidatedSalaryView: React.FC = () => {
         </div>
 
         {/* Card 3: Lương Cứng NUTELLA */}
-        <div className="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-2xs font-bold uppercase tracking-wider text-amber-800">
-              Lương Cứng NUTELLA (166k/công)
-            </span>
-            <div className="text-lg sm:text-xl font-mono font-bold text-amber-950">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}
+        <div className="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-2xs font-bold uppercase tracking-wider text-amber-800">
+                Lương Cứng NUTELLA (166k/công)
+              </span>
+              <div className="text-lg sm:text-xl font-mono font-bold text-amber-950">
+                {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}
+              </div>
+              <p className="text-2xs text-slate-500">
+                Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toFixed(1)} ngày công</strong> dự án Nutella
+              </p>
             </div>
-            <p className="text-2xs text-slate-500">
-              Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toFixed(1)} ngày công</strong> dự án Nutella
-            </p>
+            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 border border-amber-100">
+              <Calendar className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 border border-amber-100">
-            <Calendar className="w-5 h-5" />
-          </div>
+          {onSwitchSection && (
+            <button
+              type="button"
+              onClick={() => onSwitchSection('nutella_timesheet')}
+              className="text-2xs font-bold text-amber-700 hover:text-amber-800 hover:underline flex items-center gap-1 pt-1 border-t border-amber-100 cursor-pointer self-start"
+            >
+              <span>Xem bảng chấm công & quy tắc 3 giai đoạn</span>
+              <span className="text-xs">→</span>
+            </button>
+          )}
         </div>
 
         {/* Card 4: Dự Án VIN */}

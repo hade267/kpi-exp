@@ -6,10 +6,11 @@ import { PersonnelTable } from './components/PersonnelTable';
 import { DetailedReconView } from './components/DetailedReconView';
 import { AnalyticsCharts } from './components/AnalyticsCharts';
 import { ConsolidatedSalaryView } from './components/ConsolidatedSalaryView';
+import { NutellaTimesheetView } from './components/NutellaTimesheetView';
 import { UploadIssueModal } from './components/UploadIssueModal';
 import { PERSONNEL_DATA, PROJECT_SUMMARY } from './data/reconData';
 import { getPersonnelWithUploadPolicy, getProjectSummaryWithUploadPolicy } from './data/uploadIssueData';
-import { ShieldCheck, Sparkles, Wallet } from 'lucide-react';
+import { ShieldCheck, Sparkles, Wallet, Calendar } from 'lucide-react';
 import { formatHours, formatNumber, formatPercent } from './utils/formatters';
 
 export default function App() {
@@ -155,8 +156,10 @@ export default function App() {
                 />
               )}
             </>
+          ) : currentSection === 'nutella_timesheet' ? (
+            <NutellaTimesheetView onSwitchSection={setCurrentSection} />
           ) : (
-            <ConsolidatedSalaryView />
+            <ConsolidatedSalaryView onSwitchSection={setCurrentSection} />
           )}
         </main>
 
@@ -181,6 +184,11 @@ export default function App() {
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Đối soát nghiệm thu EGO Giai đoạn II • 27 nhân sự</span>
                 </>
+              ) : currentSection === 'nutella_timesheet' ? (
+                <>
+                  <Calendar className="w-4 h-4 text-amber-600" />
+                  <span>Bảng chấm công & giờ làm việc gốc NUTELLA (06/08 – 30/08/2026) • 291,5 công • 48.389.000 đ</span>
+                </>
               ) : (
                 <>
                   <Wallet className="w-4 h-4 text-emerald-600" />
@@ -192,6 +200,8 @@ export default function App() {
             <div className="text-slate-400 text-2xs">
               {currentSection === 'ego_inspection'
                 ? 'Khớp 100% từng giây với file gốc'
+                : currentSection === 'nutella_timesheet'
+                ? 'Quy chuẩn 3 giai đoạn: GĐ1 (5h), GĐ2 (10h), GĐ3A (20h), GĐ3B (25h)'
                 : 'Đã chuẩn hóa định mức 50k/h và công 153k - 166k/ngày'}
             </div>
           </div>

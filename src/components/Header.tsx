@@ -9,7 +9,8 @@ import {
   Sparkles,
   Menu,
   Wallet,
-  ArrowRight
+  ArrowRight,
+  Calendar
 } from 'lucide-react';
 import { formatHours, formatCurrencyVND } from '../utils/formatters';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
@@ -70,6 +71,25 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                   <p className="text-xs text-slate-500">
                     Số liệu chuẩn gốc {includeUploadValid ? '• Đã tính Valid 280 bài 上传问题' : '• Bản nghiệm thu ban đầu'}
+                  </p>
+                </div>
+              </div>
+            ) : currentSection === 'nutella_timesheet' ? (
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-sm flex-shrink-0">
+                  <Calendar className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                      Chấm Công & Giờ Làm Việc NUTELLA
+                    </h1>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-300 font-mono">
+                      06/08 – 30/08/2026
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Quy tắc 3 giai đoạn (5h - 10h - 20h - 25h) • 291,5 công • Tổng: 48.389.000 đ
                   </p>
                 </div>
               </div>
@@ -139,15 +159,44 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 </div>
               </>
+            ) : currentSection === 'nutella_timesheet' ? (
+              <div className="flex items-center gap-2">
+                <button
+                  id="btn-switch-to-salary-from-nutella"
+                  onClick={() => onSelectSection('consolidated_salary')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
+                >
+                  <Wallet className="w-3.5 h-3.5" />
+                  <span>Bảng Lương (109,1M)</span>
+                </button>
+                <button
+                  id="btn-switch-to-ego-from-nutella"
+                  onClick={() => onSelectSection('ego_inspection')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200 cursor-pointer"
+                >
+                  <span>Đối Soát EGO</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                </button>
+              </div>
             ) : (
-              <button
-                id="btn-switch-to-ego"
-                onClick={() => onSelectSection('ego_inspection')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200 cursor-pointer"
-              >
-                <span>Sang Đối Soát EGO</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  id="btn-switch-to-nutella-from-salary"
+                  onClick={() => onSelectSection('nutella_timesheet')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-amber-700" />
+                  <span>Chấm Công Nutella (291,5c)</span>
+                </button>
+                <button
+                  id="btn-switch-to-ego"
+                  onClick={() => onSelectSection('ego_inspection')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200 cursor-pointer"
+                >
+                  <span>Đối Soát EGO</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                </button>
+              </div>
             )}
           </div>
         </div>

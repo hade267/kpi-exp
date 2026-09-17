@@ -1,6 +1,6 @@
 {
   "name": "Hệ Thống Kiểm Tra Đối Soát EGO",
-  "description": "Cổng quản trị đối soát nghiệm thu dự án EGO Giai đoạn II và bảng tổng hợp công, thù lao chi tiết (VIN - EGO - NUTELLA) cho nhân sự.",
+  "description": "Cổng quản trị đối soát nghiệm thu dự án EGO Giai đoạn II, bảng tổng hợp lương 36 nhân sự (VIN - EGO - NUTELLA) và bảng chấm công chi tiết 3 giai đoạn Nutella.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
