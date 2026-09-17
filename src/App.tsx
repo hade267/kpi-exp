@@ -10,8 +10,9 @@ import { NutellaTimesheetView } from './components/NutellaTimesheetView';
 import { UploadIssueModal } from './components/UploadIssueModal';
 import { PERSONNEL_DATA, PROJECT_SUMMARY } from './data/reconData';
 import { getPersonnelWithUploadPolicy, getProjectSummaryWithUploadPolicy } from './data/uploadIssueData';
-import { ShieldCheck, Sparkles, Wallet, Calendar } from 'lucide-react';
+import { ShieldCheck, Sparkles, Wallet, Calendar, FolderOpen, ExternalLink } from 'lucide-react';
 import { formatHours, formatNumber, formatPercent } from './utils/formatters';
+import { DRIVE_LINKS } from './data/driveLinks';
 
 export default function App() {
   const [currentSection, setCurrentSection] = useState<MainSection>('ego_inspection');
@@ -197,12 +198,31 @@ export default function App() {
               )}
             </div>
 
-            <div className="text-slate-400 text-2xs">
-              {currentSection === 'ego_inspection'
-                ? 'Khớp 100% từng giây với file gốc'
-                : currentSection === 'nutella_timesheet'
-                ? 'Quy chuẩn 3 giai đoạn: GĐ1 (5h), GĐ2 (10h), GĐ3A (20h), GĐ3B (25h)'
-                : 'Đã chuẩn hóa định mức 50k/h và công 153k - 166k/ngày'}
+            <div className="flex items-center gap-3 text-2xs text-slate-500 flex-wrap">
+              <span className="text-slate-400">Hồ sơ Google Drive:</span>
+              <a
+                id="footer-link-drive-ego"
+                href={DRIVE_LINKS.egoInspection}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium hover:underline"
+              >
+                <FolderOpen className="w-3 h-3" />
+                <span>Drive EGO</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+              </a>
+              <span className="text-slate-300">•</span>
+              <a
+                id="footer-link-drive-nutella"
+                href={DRIVE_LINKS.nutellaInspection}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-amber-700 hover:text-amber-900 font-medium hover:underline"
+              >
+                <FolderOpen className="w-3 h-3" />
+                <span>Drive Nutella</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-60" />
+              </a>
             </div>
           </div>
         </footer>

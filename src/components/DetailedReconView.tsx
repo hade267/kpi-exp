@@ -11,10 +11,13 @@ import {
   CheckCircle2,
   Calendar,
   Layers,
-  Sparkles
+  Sparkles,
+  FolderOpen,
+  ExternalLink
 } from 'lucide-react';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
 import { formatCurrencyVND } from '../utils/formatters';
+import { DRIVE_LINKS } from '../data/driveLinks';
 
 interface DetailedReconViewProps {
   initialPersonnelId?: number | null;
@@ -53,19 +56,34 @@ export const DetailedReconView: React.FC<DetailedReconViewProps> = ({
             </div>
           </div>
 
-          {/* Quick jump to consolidated salary */}
-          {onSwitchSection && (
-            <button
-              id="btn-switch-to-salary-from-detailed"
-              type="button"
-              onClick={() => onSwitchSection('consolidated_salary')}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer self-start sm:self-auto flex-shrink-0"
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0 flex-wrap">
+            <a
+              id="btn-detailed-drive-ego"
+              href={DRIVE_LINKS.egoInspection}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              title="Mở thư mục Google Drive chứa hồ sơ đối soát EGO"
             >
-              <Wallet className="w-4 h-4" />
-              <span>Xem Bảng Lương (109,1M)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
+              <FolderOpen className="w-4 h-4" />
+              <span>Hồ Sơ Đối Soát EGO (Drive)</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+            </a>
+
+            {onSwitchSection && (
+              <button
+                id="btn-switch-to-salary-from-detailed"
+                type="button"
+                onClick={() => onSwitchSection('consolidated_salary')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+              >
+                <Wallet className="w-4 h-4" />
+                <span>Xem Bảng Lương (109,1M)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

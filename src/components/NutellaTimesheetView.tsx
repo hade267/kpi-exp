@@ -17,8 +17,11 @@ import {
   ArrowRight,
   Calculator,
   Eye,
-  FileSpreadsheet
+  FileSpreadsheet,
+  FolderOpen,
+  ExternalLink
 } from 'lucide-react';
+import { DRIVE_LINKS } from '../data/driveLinks';
 import {
   NUTELLA_DATES,
   NUTELLA_RULES,
@@ -185,9 +188,22 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
             </div>
           </div>
 
-          {/* Quick jump to consolidated salary */}
-          {onSwitchSection && (
-            <div className="flex items-center gap-2 self-start lg:self-auto flex-shrink-0">
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 self-start lg:self-auto flex-shrink-0 flex-wrap">
+            <a
+              id="btn-nutella-banner-drive"
+              href={DRIVE_LINKS.nutellaInspection}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40 text-xs font-bold transition-colors shadow-2xs cursor-pointer"
+              title="Mở thư mục Google Drive chứa hồ sơ đối soát Nutella"
+            >
+              <FolderOpen className="w-4 h-4 text-amber-400" />
+              <span>Hồ Sơ Đối Soát (Drive)</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </a>
+
+            {onSwitchSection && (
               <button
                 type="button"
                 onClick={() => onSwitchSection('consolidated_salary')}
@@ -197,8 +213,8 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
                 <span>Xem Bảng Lương (109,1M)</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

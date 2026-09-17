@@ -5,10 +5,13 @@ import {
   X,
   Calculator,
   Layers,
-  Calendar
+  Calendar,
+  FolderOpen,
+  ExternalLink
 } from 'lucide-react';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
 import { formatCurrencyVND } from '../utils/formatters';
+import { DRIVE_LINKS } from '../data/driveLinks';
 
 export type MainSection = 'ego_inspection' | 'consolidated_salary' | 'nutella_timesheet';
 
@@ -182,6 +185,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
               </button>
             </nav>
+          </div>
+
+          {/* Google Drive Recon Folders */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-800">
+            <div className="px-2 text-3xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+              <span>Hồ Sơ Đối Soát (Drive)</span>
+              <FolderOpen className="w-3 h-3 text-slate-500" />
+            </div>
+
+            <div className="space-y-1">
+              <a
+                id="sidebar-link-drive-ego"
+                href={DRIVE_LINKS.egoInspection}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left px-3 py-2 rounded-xl transition-all flex items-center justify-between text-slate-300 hover:bg-slate-800/90 hover:text-indigo-300 group cursor-pointer text-xs"
+                title="Mở thư mục Google Drive Đối Soát EGO"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <FolderOpen className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                  <span className="truncate">Drive Đối Soát EGO</span>
+                </div>
+                <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-indigo-400 shrink-0 ml-1" />
+              </a>
+
+              <a
+                id="sidebar-link-drive-nutella"
+                href={DRIVE_LINKS.nutellaInspection}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left px-3 py-2 rounded-xl transition-all flex items-center justify-between text-slate-300 hover:bg-slate-800/90 hover:text-amber-300 group cursor-pointer text-xs"
+                title="Mở thư mục Google Drive Đối Soát Nutella"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <FolderOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span className="truncate">Drive Đối Soát Nutella</span>
+                </div>
+                <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-amber-400 shrink-0 ml-1" />
+              </a>
+            </div>
           </div>
 
           {/* Quick Unit Rates Reference */}

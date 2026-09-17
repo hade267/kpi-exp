@@ -19,8 +19,11 @@ import {
   Clock,
   Calendar,
   Building2,
-  Users
+  Users,
+  FolderOpen,
+  ExternalLink
 } from 'lucide-react';
+import { DRIVE_LINKS } from '../data/driveLinks';
 
 type SortColumn =
   | 'stt'
@@ -232,21 +235,35 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
         </div>
 
         {/* Card 2: KPI EGO */}
-        <div className="bg-white rounded-2xl p-4 border border-indigo-200/80 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-2xs font-bold uppercase tracking-wider text-indigo-800">
-              KPI Dự Án EGO (50k/h)
-            </span>
-            <div className="text-lg sm:text-xl font-mono font-bold text-indigo-950">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}
+        <div className="bg-white rounded-2xl p-4 border border-indigo-200/80 shadow-xs flex flex-col justify-between space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-2xs font-bold uppercase tracking-wider text-indigo-800">
+                KPI Dự Án EGO (50k/h)
+              </span>
+              <div className="text-lg sm:text-xl font-mono font-bold text-indigo-950">
+                {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}
+              </div>
+              <p className="text-2xs text-slate-500">
+                Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toFixed(2)}h</strong> Pass nghiệm thu EGO
+              </p>
             </div>
-            <p className="text-2xs text-slate-500">
-              Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toFixed(2)}h</strong> Pass nghiệm thu EGO
-            </p>
+            <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 border border-indigo-100">
+              <Clock className="w-5 h-5" />
+            </div>
           </div>
-          <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 border border-indigo-100">
-            <Clock className="w-5 h-5" />
-          </div>
+          <a
+            id="card-link-drive-ego"
+            href={DRIVE_LINKS.egoInspection}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-2xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 pt-1 border-t border-indigo-100 cursor-pointer self-start"
+            title="Mở thư mục Google Drive đối soát EGO"
+          >
+            <FolderOpen className="w-3 h-3 text-indigo-500" />
+            <span>Thư mục đối soát EGO (Drive)</span>
+            <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+          </a>
         </div>
 
         {/* Card 3: Lương Cứng NUTELLA */}
@@ -267,16 +284,30 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
               <Calendar className="w-5 h-5" />
             </div>
           </div>
-          {onSwitchSection && (
-            <button
-              type="button"
-              onClick={() => onSwitchSection('nutella_timesheet')}
-              className="text-2xs font-bold text-amber-700 hover:text-amber-800 hover:underline flex items-center gap-1 pt-1 border-t border-amber-100 cursor-pointer self-start"
+          <div className="flex items-center justify-between gap-2 pt-1 border-t border-amber-100 flex-wrap">
+            {onSwitchSection && (
+              <button
+                type="button"
+                onClick={() => onSwitchSection('nutella_timesheet')}
+                className="text-2xs font-bold text-amber-700 hover:text-amber-800 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <span>Bảng chấm công 3 GĐ</span>
+                <span className="text-xs">→</span>
+              </button>
+            )}
+            <a
+              id="card-link-drive-nutella"
+              href={DRIVE_LINKS.nutellaInspection}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-2xs font-bold text-amber-700 hover:text-amber-900 hover:underline flex items-center gap-1 cursor-pointer"
+              title="Mở thư mục Google Drive đối soát Nutella"
             >
-              <span>Xem bảng chấm công & quy tắc 3 giai đoạn</span>
-              <span className="text-xs">→</span>
-            </button>
-          )}
+              <FolderOpen className="w-3 h-3 text-amber-500" />
+              <span>Drive Nutella</span>
+              <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+            </a>
+          </div>
         </div>
 
         {/* Card 4: Dự Án VIN */}

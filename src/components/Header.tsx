@@ -10,10 +10,13 @@ import {
   Menu,
   Wallet,
   ArrowRight,
-  Calendar
+  Calendar,
+  FolderOpen,
+  ExternalLink
 } from 'lucide-react';
 import { formatHours, formatCurrencyVND } from '../utils/formatters';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
+import { DRIVE_LINKS } from '../data/driveLinks';
 import { MainSection } from './Sidebar';
 
 interface HeaderProps {
@@ -119,6 +122,20 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             {currentSection === 'ego_inspection' ? (
               <>
+                {/* Direct Google Drive Link for EGO */}
+                <a
+                  id="btn-header-drive-ego"
+                  href={DRIVE_LINKS.egoInspection}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors shadow-2xs cursor-pointer"
+                  title="Mở thư mục Google Drive chứa hồ sơ đối soát EGO"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Drive EGO</span>
+                  <ExternalLink className="w-3 h-3 text-indigo-400" />
+                </a>
+
                 {/* Upload issue detail modal button */}
                 <button
                   id="btn-header-upload-policy"
@@ -160,7 +177,21 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </>
             ) : currentSection === 'nutella_timesheet' ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Direct Google Drive Link for Nutella */}
+                <a
+                  id="btn-header-drive-nutella"
+                  href={DRIVE_LINKS.nutellaInspection}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors shadow-2xs cursor-pointer"
+                  title="Mở thư mục Google Drive chứa hồ sơ đối soát Nutella"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-amber-700" />
+                  <span>Drive Nutella</span>
+                  <ExternalLink className="w-3 h-3 text-amber-600" />
+                </a>
+
                 <button
                   id="btn-switch-to-salary-from-nutella"
                   onClick={() => onSelectSection('consolidated_salary')}
@@ -179,7 +210,34 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Drive links for Consolidated Salary */}
+                <a
+                  id="btn-header-salary-drive-ego"
+                  href={DRIVE_LINKS.egoInspection}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-2xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors cursor-pointer"
+                  title="Mở thư mục Google Drive Đối Soát EGO"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Drive EGO</span>
+                  <ExternalLink className="w-3 h-3 text-indigo-400" />
+                </a>
+
+                <a
+                  id="btn-header-salary-drive-nutella"
+                  href={DRIVE_LINKS.nutellaInspection}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-2xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer"
+                  title="Mở thư mục Google Drive Đối Soát Nutella"
+                >
+                  <FolderOpen className="w-3.5 h-3.5 text-amber-700" />
+                  <span>Drive Nutella</span>
+                  <ExternalLink className="w-3 h-3 text-amber-600" />
+                </a>
+
                 <button
                   id="btn-switch-to-nutella-from-salary"
                   onClick={() => onSelectSection('nutella_timesheet')}
