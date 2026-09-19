@@ -7,7 +7,6 @@ import {
   BarChart3,
   ListFilter,
   Sparkles,
-  Menu,
   Wallet,
   ArrowRight,
   Calendar,
@@ -22,7 +21,7 @@ import { MainSection } from './Sidebar';
 interface HeaderProps {
   currentSection: MainSection;
   onSelectSection: (section: MainSection) => void;
-  onToggleMobileSidebar: () => void;
+  onToggleMobileSidebar?: () => void;
   activeTab: 'lookup' | 'table' | 'detailed' | 'analytics';
   setActiveTab: (tab: 'lookup' | 'table' | 'detailed' | 'analytics') => void;
   totalPassHours: number;
@@ -34,7 +33,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   currentSection,
   onSelectSection,
-  onToggleMobileSidebar,
   activeTab,
   setActiveTab,
   totalPassHours,
@@ -44,19 +42,10 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs no-print">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
-          {/* Left: Sidebar trigger + Title */}
+          {/* Left: Title */}
           <div className="flex items-center gap-3">
-            <button
-              id="btn-toggle-sidebar"
-              onClick={onToggleMobileSidebar}
-              className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-slate-200 lg:hidden cursor-pointer"
-              title="Mở menu chuyển đổi mục"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-
             {currentSection === 'ego_inspection' ? (
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm flex-shrink-0">

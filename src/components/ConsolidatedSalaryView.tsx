@@ -375,9 +375,6 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
           <span>
             Đang hiển thị <strong>{processedData.length}</strong> / 36 nhân sự
           </span>
-          <span className="text-slate-400">
-            * Bảng lương tổng hợp 14 cột chi tiết: VIN (50k/153k) • EGO (50k) • NUTELLA (7k/2k/166k)
-          </span>
         </div>
       </div>
 
@@ -388,28 +385,28 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
             <thead>
               {/* Top grouping row */}
               <tr className="bg-slate-100 text-slate-700 border-b border-slate-300 font-bold text-2xs uppercase tracking-wider select-none">
-                <th colSpan={2} className="py-2.5 px-3 border-r border-slate-300">
+                <th colSpan={2} className="py-2 px-2 border-r border-slate-300">
                   Nhân Sự
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-blue-50/90 text-blue-900 border-r border-slate-300">
+                <th colSpan={2} className="py-2 px-1.5 text-center bg-blue-50/90 text-blue-900 border-r border-slate-300">
                   KPI VIN (50k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-indigo-50/90 text-indigo-900 border-r border-slate-300">
+                <th colSpan={2} className="py-2 px-1.5 text-center bg-indigo-50/90 text-indigo-900 border-r border-slate-300">
                   KPI EGO (50k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-amber-50/90 text-amber-900 border-r border-slate-300">
-                  KPI NUTELLA (7k/h)
+                <th colSpan={2} className="py-2 px-1.5 text-center bg-amber-50/90 text-amber-900 border-r border-slate-300">
+                  KPI NUT (7k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-purple-50/90 text-purple-900 border-r border-slate-300">
-                  KPI QA NUTELLA (2k/h)
+                <th colSpan={2} className="py-2 px-1.5 text-center bg-purple-50/90 text-purple-900 border-r border-slate-300">
+                  QA NUT (2k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-cyan-50/90 text-cyan-900 border-r border-slate-300">
-                  LƯƠNG CỨNG VIN (153k/ngày)
+                <th colSpan={2} className="py-2 px-1.5 text-center bg-cyan-50/90 text-cyan-900 border-r border-slate-300">
+                  CỨNG VIN (153k/c)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-orange-50/90 text-orange-900 border-r border-slate-300">
-                  LƯƠNG CỨNG NUTELLA (166k/ngày)
+                <th colSpan={2} className="py-2 px-1.5 text-center bg-orange-50/90 text-orange-900 border-r border-slate-300">
+                  CỨNG NUT (166k/c)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-emerald-100 text-emerald-950 font-black">
+                <th colSpan={2} className="py-2 px-2 text-center bg-emerald-100 text-emerald-950 font-black">
                   TỔNG LƯƠNG & PHIẾU
                 </th>
               </tr>
@@ -419,170 +416,170 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* STT */}
                 <th
                   onClick={() => handleSort('stt')}
-                  className="py-2.5 px-2.5 w-10 text-center cursor-pointer hover:bg-slate-100 transition-colors"
+                  className="py-2 px-1 w-8 text-center cursor-pointer hover:bg-slate-100 transition-colors"
                 >
-                  <div className="flex items-center justify-center gap-0.5">
+                  <div className="flex items-center justify-center">
                     <span>STT</span>
-                    {sortCol === 'stt' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
+                    {sortCol === 'stt' && <ArrowUpDown className="w-2.5 h-2.5 text-indigo-600 ml-0.5" />}
                   </div>
                 </th>
 
                 {/* Name */}
                 <th
                   onClick={() => handleSort('name')}
-                  className="py-2.5 px-3 min-w-[150px] cursor-pointer hover:bg-slate-100 transition-colors border-r border-slate-200"
+                  className="py-2 px-2 min-w-[125px] cursor-pointer hover:bg-slate-100 transition-colors border-r border-slate-200"
                 >
                   <div className="flex items-center gap-1">
-                    <span>Tên</span>
-                    {sortCol === 'name' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
+                    <span>Họ và Tên</span>
+                    {sortCol === 'name' && <ArrowUpDown className="w-2.5 h-2.5 text-indigo-600" />}
                   </div>
                 </th>
 
                 {/* KPI VIN: hours */}
                 <th
                   onClick={() => handleSort('kpiVinHours')}
-                  className="py-2.5 px-2.5 text-right min-w-[70px] cursor-pointer hover:bg-blue-100/60 bg-blue-50/30 transition-colors"
+                  className="py-2 px-1.5 text-right min-w-[46px] cursor-pointer hover:bg-blue-100/60 bg-blue-50/30 transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>KPI VIN</span>
-                    {sortCol === 'kpiVinHours' && <ArrowUpDown className="w-3 h-3 text-blue-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Giờ</span>
+                    {sortCol === 'kpiVinHours' && <ArrowUpDown className="w-2.5 h-2.5 text-blue-600" />}
                   </div>
                 </th>
 
                 {/* KPI VIN: salary */}
                 <th
                   onClick={() => handleSort('kpiVinSalary')}
-                  className="py-2.5 px-2.5 text-right min-w-[100px] cursor-pointer hover:bg-blue-100/60 bg-blue-50/30 transition-colors border-r border-slate-200"
+                  className="py-2 px-1.5 text-right min-w-[68px] cursor-pointer hover:bg-blue-100/60 bg-blue-50/30 transition-colors border-r border-slate-200"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>LƯƠNG VIN</span>
-                    {sortCol === 'kpiVinSalary' && <ArrowUpDown className="w-3 h-3 text-blue-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Lương</span>
+                    {sortCol === 'kpiVinSalary' && <ArrowUpDown className="w-2.5 h-2.5 text-blue-600" />}
                   </div>
                 </th>
 
                 {/* KPI EGO: hours */}
                 <th
                   onClick={() => handleSort('kpiEgoHours')}
-                  className="py-2.5 px-2.5 text-right min-w-[75px] cursor-pointer hover:bg-indigo-100/60 bg-indigo-50/30 transition-colors"
+                  className="py-2 px-1.5 text-right min-w-[46px] cursor-pointer hover:bg-indigo-100/60 bg-indigo-50/30 transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>KPI EGO</span>
-                    {sortCol === 'kpiEgoHours' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Giờ</span>
+                    {sortCol === 'kpiEgoHours' && <ArrowUpDown className="w-2.5 h-2.5 text-indigo-600" />}
                   </div>
                 </th>
 
                 {/* KPI EGO: salary */}
                 <th
                   onClick={() => handleSort('kpiEgoSalary')}
-                  className="py-2.5 px-2.5 text-right min-w-[105px] cursor-pointer hover:bg-indigo-100/60 bg-indigo-50/30 transition-colors border-r border-slate-200"
+                  className="py-2 px-1.5 text-right min-w-[70px] cursor-pointer hover:bg-indigo-100/60 bg-indigo-50/30 transition-colors border-r border-slate-200"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>LƯƠNG EGO</span>
-                    {sortCol === 'kpiEgoSalary' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Lương</span>
+                    {sortCol === 'kpiEgoSalary' && <ArrowUpDown className="w-2.5 h-2.5 text-indigo-600" />}
                   </div>
                 </th>
 
                 {/* KPI NUTELLA: hours */}
                 <th
                   onClick={() => handleSort('kpiNutellaHours')}
-                  className="py-2.5 px-2.5 text-right min-w-[90px] cursor-pointer hover:bg-amber-100/60 bg-amber-50/30 transition-colors"
+                  className="py-2 px-1.5 text-right min-w-[46px] cursor-pointer hover:bg-amber-100/60 bg-amber-50/30 transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>KPI NUTELLA</span>
-                    {sortCol === 'kpiNutellaHours' && <ArrowUpDown className="w-3 h-3 text-amber-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Giờ</span>
+                    {sortCol === 'kpiNutellaHours' && <ArrowUpDown className="w-2.5 h-2.5 text-amber-600" />}
                   </div>
                 </th>
 
                 {/* KPI NUTELLA: salary */}
                 <th
                   onClick={() => handleSort('kpiNutellaSalary')}
-                  className="py-2.5 px-2.5 text-right min-w-[110px] cursor-pointer hover:bg-amber-100/60 bg-amber-50/30 transition-colors border-r border-slate-200"
+                  className="py-2 px-1.5 text-right min-w-[72px] cursor-pointer hover:bg-amber-100/60 bg-amber-50/30 transition-colors border-r border-slate-200"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>LƯƠNG NUTELLA</span>
-                    {sortCol === 'kpiNutellaSalary' && <ArrowUpDown className="w-3 h-3 text-amber-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Lương</span>
+                    {sortCol === 'kpiNutellaSalary' && <ArrowUpDown className="w-2.5 h-2.5 text-amber-600" />}
                   </div>
                 </th>
 
                 {/* KPI QA NUTELLA: hours */}
                 <th
                   onClick={() => handleSort('kpiQaNutellaHours')}
-                  className="py-2.5 px-2.5 text-right min-w-[85px] cursor-pointer hover:bg-purple-100/60 bg-purple-50/30 transition-colors"
+                  className="py-2 px-1.5 text-right min-w-[44px] cursor-pointer hover:bg-purple-100/60 bg-purple-50/30 transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>KPI QA</span>
-                    {sortCol === 'kpiQaNutellaHours' && <ArrowUpDown className="w-3 h-3 text-purple-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Giờ</span>
+                    {sortCol === 'kpiQaNutellaHours' && <ArrowUpDown className="w-2.5 h-2.5 text-purple-600" />}
                   </div>
                 </th>
 
                 {/* KPI QA NUTELLA: salary */}
                 <th
                   onClick={() => handleSort('kpiQaNutellaSalary')}
-                  className="py-2.5 px-2.5 text-right min-w-[105px] cursor-pointer hover:bg-purple-100/60 bg-purple-50/30 transition-colors border-r border-slate-200"
+                  className="py-2 px-1.5 text-right min-w-[68px] cursor-pointer hover:bg-purple-100/60 bg-purple-50/30 transition-colors border-r border-slate-200"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>LƯƠNG QA</span>
-                    {sortCol === 'kpiQaNutellaSalary' && <ArrowUpDown className="w-3 h-3 text-purple-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Lương</span>
+                    {sortCol === 'kpiQaNutellaSalary' && <ArrowUpDown className="w-2.5 h-2.5 text-purple-600" />}
                   </div>
                 </th>
 
                 {/* WORKDAYS VIN */}
                 <th
                   onClick={() => handleSort('workdaysVin')}
-                  className="py-2.5 px-2.5 text-right min-w-[70px] cursor-pointer hover:bg-cyan-100/60 bg-cyan-50/30 transition-colors"
+                  className="py-2 px-1.5 text-right min-w-[44px] cursor-pointer hover:bg-cyan-100/60 bg-cyan-50/30 transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>CÔNG VIN</span>
-                    {sortCol === 'workdaysVin' && <ArrowUpDown className="w-3 h-3 text-cyan-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Công</span>
+                    {sortCol === 'workdaysVin' && <ArrowUpDown className="w-2.5 h-2.5 text-cyan-600" />}
                   </div>
                 </th>
 
                 {/* FIXED SALARY VIN */}
                 <th
                   onClick={() => handleSort('fixedSalaryVin')}
-                  className="py-2.5 px-2.5 text-right min-w-[95px] cursor-pointer hover:bg-cyan-100/60 bg-cyan-50/30 transition-colors border-r border-slate-200"
+                  className="py-2 px-1.5 text-right min-w-[70px] cursor-pointer hover:bg-cyan-100/60 bg-cyan-50/30 transition-colors border-r border-slate-200"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>CỨNG VIN</span>
-                    {sortCol === 'fixedSalaryVin' && <ArrowUpDown className="w-3 h-3 text-cyan-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Lương</span>
+                    {sortCol === 'fixedSalaryVin' && <ArrowUpDown className="w-2.5 h-2.5 text-cyan-600" />}
                   </div>
                 </th>
 
                 {/* WORKDAYS NUTELLA */}
                 <th
                   onClick={() => handleSort('workdaysNutella')}
-                  className="py-2.5 px-2.5 text-right min-w-[75px] cursor-pointer hover:bg-orange-100/60 bg-orange-50/30 transition-colors"
+                  className="py-2 px-1.5 text-right min-w-[46px] cursor-pointer hover:bg-orange-100/60 bg-orange-50/30 transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>CÔNG NUT.</span>
-                    {sortCol === 'workdaysNutella' && <ArrowUpDown className="w-3 h-3 text-orange-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Công</span>
+                    {sortCol === 'workdaysNutella' && <ArrowUpDown className="w-2.5 h-2.5 text-orange-600" />}
                   </div>
                 </th>
 
                 {/* FIXED SALARY NUTELLA */}
                 <th
                   onClick={() => handleSort('fixedSalaryNutella')}
-                  className="py-2.5 px-2.5 text-right min-w-[105px] cursor-pointer hover:bg-orange-100/60 bg-orange-50/30 transition-colors border-r border-slate-200"
+                  className="py-2 px-1.5 text-right min-w-[72px] cursor-pointer hover:bg-orange-100/60 bg-orange-50/30 transition-colors border-r border-slate-200"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>CỨNG NUT.</span>
-                    {sortCol === 'fixedSalaryNutella' && <ArrowUpDown className="w-3 h-3 text-orange-600" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Lương</span>
+                    {sortCol === 'fixedSalaryNutella' && <ArrowUpDown className="w-2.5 h-2.5 text-orange-600" />}
                   </div>
                 </th>
 
                 {/* TOTAL SALARY */}
                 <th
                   onClick={() => handleSort('totalSalary')}
-                  className="py-2.5 px-3 text-right min-w-[125px] cursor-pointer hover:bg-emerald-200 bg-emerald-100 text-emerald-950 font-black transition-colors"
+                  className="py-2 px-2 text-right min-w-[88px] cursor-pointer hover:bg-emerald-200 bg-emerald-100 text-emerald-950 font-black transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1">
-                    <span>TỔNG LƯƠNG</span>
-                    {sortCol === 'totalSalary' && <ArrowUpDown className="w-3 h-3 text-emerald-800" />}
+                  <div className="flex items-center justify-end gap-0.5">
+                    <span>Tổng Lương</span>
+                    {sortCol === 'totalSalary' && <ArrowUpDown className="w-2.5 h-2.5 text-emerald-800" />}
                   </div>
                 </th>
 
                 {/* Action */}
-                <th className="py-2.5 px-2 text-center bg-slate-50 w-14">
+                <th className="py-2 px-1 text-center bg-slate-50 w-12">
                   <span>Phiếu</span>
                 </th>
               </tr>
@@ -600,17 +597,17 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                     }`}
                   >
                     {/* STT */}
-                    <td className="py-2 px-2.5 text-slate-400 text-center font-mono text-3xs">
+                    <td className="py-1.5 px-1 text-slate-400 text-center font-mono text-3xs">
                       {item.stt}
                     </td>
 
                     {/* Tên */}
-                    <td className="py-2 px-3 font-sans font-bold text-slate-900 group-hover:text-indigo-600 transition-colors border-r border-slate-200 text-xs">
+                    <td className="py-1.5 px-2 font-sans font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors border-r border-slate-200 text-xs whitespace-nowrap">
                       <div className="flex items-center justify-between gap-1">
-                        <span className="truncate">{item.name}</span>
+                        <span>{item.name}</span>
                         {isHighEarner && (
                           <span
-                            className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"
+                            className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 ml-1"
                             title="Lương trên 4 triệu VNĐ"
                           ></span>
                         )}
@@ -618,78 +615,78 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                     </td>
 
                     {/* KPI VIN: h */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-blue-50/10">
-                      {item.kpiVinHours !== null ? item.kpiVinHours.toLocaleString('vi-VN') : ''}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-blue-50/10">
+                      {item.kpiVinHours !== null ? item.kpiVinHours.toLocaleString('vi-VN') : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* LƯƠNG KPI VIN */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-blue-50/10 border-r border-slate-200">
-                      {item.kpiVinSalary ? `${formatNumber(item.kpiVinSalary)}₫` : '0₫'}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-blue-50/10 border-r border-slate-200">
+                      {item.kpiVinSalary ? `${formatNumber(item.kpiVinSalary)}₫` : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* KPI EGO: h */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-indigo-50/10">
-                      {item.kpiEgoHours !== null ? item.kpiEgoHours.toLocaleString('vi-VN') : ''}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-indigo-50/10">
+                      {item.kpiEgoHours !== null ? item.kpiEgoHours.toLocaleString('vi-VN') : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* LƯƠNG KPI EGO */}
-                    <td className="py-2 px-2.5 text-right font-medium text-indigo-700 bg-indigo-50/10 border-r border-slate-200">
-                      {item.kpiEgoSalary ? `${formatNumber(item.kpiEgoSalary)}₫` : '0₫'}
+                    <td className="py-1.5 px-1.5 text-right font-medium text-indigo-700 bg-indigo-50/10 border-r border-slate-200">
+                      {item.kpiEgoSalary ? `${formatNumber(item.kpiEgoSalary)}₫` : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* KPI NUTELLA: h */}
-                    <td className="py-2 px-2.5 text-right font-medium text-slate-800 bg-amber-50/10">
-                      {item.kpiNutellaHours !== null ? item.kpiNutellaHours.toLocaleString('vi-VN') : ''}
+                    <td className="py-1.5 px-1.5 text-right font-medium text-slate-800 bg-amber-50/10">
+                      {item.kpiNutellaHours !== null ? item.kpiNutellaHours.toLocaleString('vi-VN') : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* LƯƠNG KPI NUTELLA */}
-                    <td className="py-2 px-2.5 text-right font-semibold text-amber-900 bg-amber-50/10 border-r border-slate-200">
-                      {item.kpiNutellaSalary ? `${formatNumber(item.kpiNutellaSalary)}₫` : '0₫'}
+                    <td className="py-1.5 px-1.5 text-right font-semibold text-amber-900 bg-amber-50/10 border-r border-slate-200">
+                      {item.kpiNutellaSalary ? `${formatNumber(item.kpiNutellaSalary)}₫` : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* KPI QA NUTELLA: h */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-purple-50/10">
-                      {item.kpiQaNutellaHours !== null ? item.kpiQaNutellaHours.toLocaleString('vi-VN') : ''}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-purple-50/10">
+                      {item.kpiQaNutellaHours !== null ? item.kpiQaNutellaHours.toLocaleString('vi-VN') : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* LƯƠNG QA NUTELLA */}
-                    <td className="py-2 px-2.5 text-right font-medium text-purple-700 bg-purple-50/10 border-r border-slate-200">
-                      {item.kpiQaNutellaSalary ? `${formatNumber(item.kpiQaNutellaSalary)}₫` : '0₫'}
+                    <td className="py-1.5 px-1.5 text-right font-medium text-purple-700 bg-purple-50/10 border-r border-slate-200">
+                      {item.kpiQaNutellaSalary ? `${formatNumber(item.kpiQaNutellaSalary)}₫` : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* NGÀY CÔNG VIN */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-cyan-50/10">
-                      {item.workdaysVin !== null ? item.workdaysVin.toLocaleString('vi-VN') : ''}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-cyan-50/10">
+                      {item.workdaysVin !== null ? item.workdaysVin.toLocaleString('vi-VN') : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* LƯƠNG CỨNG VIN */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-cyan-50/10 border-r border-slate-200">
-                      {item.fixedSalaryVin ? `${formatNumber(item.fixedSalaryVin)}₫` : '0₫'}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-cyan-50/10 border-r border-slate-200">
+                      {item.fixedSalaryVin ? `${formatNumber(item.fixedSalaryVin)}₫` : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* NGÀY CÔNG NUTELLA */}
-                    <td className="py-2 px-2.5 text-right text-slate-700 bg-orange-50/10">
-                      {item.workdaysNutella !== null ? item.workdaysNutella.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
+                    <td className="py-1.5 px-1.5 text-right text-slate-700 bg-orange-50/10">
+                      {item.workdaysNutella !== null ? item.workdaysNutella.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* LƯƠNG CỨNG NUTELLA */}
-                    <td className="py-2 px-2.5 text-right font-medium text-orange-800 bg-orange-50/10 border-r border-slate-200">
-                      {item.fixedSalaryNutella ? `${formatNumber(item.fixedSalaryNutella)}₫` : '0₫'}
+                    <td className="py-1.5 px-1.5 text-right font-medium text-orange-800 bg-orange-50/10 border-r border-slate-200">
+                      {item.fixedSalaryNutella ? `${formatNumber(item.fixedSalaryNutella)}₫` : <span className="text-slate-300">-</span>}
                     </td>
 
                     {/* TỔNG LƯƠNG */}
-                    <td className="py-2 px-3 text-right font-black text-emerald-700 bg-emerald-50/50 text-xs sm:text-sm">
+                    <td className="py-1.5 px-2 text-right font-bold text-emerald-700 bg-emerald-50/50 text-xs whitespace-nowrap">
                       {formatNumber(item.totalSalary)}₫
                     </td>
 
                     {/* Action */}
-                    <td className="py-2 px-2 text-center">
+                    <td className="py-1.5 px-1 text-center">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedPerson(item);
                         }}
-                        className="px-1.5 py-0.5 rounded text-3xs font-sans font-semibold bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-600 transition-colors"
+                        className="px-1.5 py-0.5 rounded text-3xs font-sans font-medium bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 transition-colors"
                       >
                         Phiếu
                       </button>
@@ -710,50 +707,50 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
             {/* Total Footer Row */}
             <tfoot className="bg-slate-900 text-white font-mono font-bold text-xs border-t-2 border-slate-900">
               <tr>
-                <td className="py-3 px-2.5 text-center text-slate-500 text-2xs">-</td>
-                <td className="py-3 px-3 font-sans uppercase tracking-wider text-xs border-r border-slate-800 text-slate-200 font-black">
+                <td className="py-2.5 px-1 text-center text-slate-500 text-2xs">-</td>
+                <td className="py-2.5 px-2 font-sans uppercase tracking-wider text-xs border-r border-slate-800 text-slate-200 font-black whitespace-nowrap">
                   TỔNG CỘNG
                 </td>
-                <td className="py-3 px-2.5 text-right text-blue-300 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-blue-300 font-mono text-2xs">
                   {CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-2.5 text-right text-blue-300 border-r border-slate-800 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-blue-300 border-r border-slate-800 font-mono text-2xs">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary)}₫
                 </td>
-                <td className="py-3 px-2.5 text-right text-indigo-300 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-indigo-300 font-mono text-2xs">
                   {CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-2.5 text-right text-indigo-300 border-r border-slate-800 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-indigo-300 border-r border-slate-800 font-mono text-2xs">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}₫
                 </td>
-                <td className="py-3 px-2.5 text-right text-amber-300 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-amber-300 font-mono text-2xs">
                   {CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-2.5 text-right text-amber-300 border-r border-slate-800 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-amber-300 border-r border-slate-800 font-mono text-2xs">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaSalary)}₫
                 </td>
-                <td className="py-3 px-2.5 text-right text-purple-300 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-purple-300 font-mono text-2xs">
                   {CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-2.5 text-right text-purple-300 border-r border-slate-800 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-purple-300 border-r border-slate-800 font-mono text-2xs">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaSalary)}₫
                 </td>
-                <td className="py-3 px-2.5 text-right text-cyan-300 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-cyan-300 font-mono text-2xs">
                   {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-2.5 text-right text-cyan-300 border-r border-slate-800 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-cyan-300 border-r border-slate-800 font-mono text-2xs">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin)}₫
                 </td>
-                <td className="py-3 px-2.5 text-right text-orange-300 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-orange-300 font-mono text-2xs">
                   {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </td>
-                <td className="py-3 px-2.5 text-right text-orange-300 border-r border-slate-800 font-mono text-2xs">
+                <td className="py-2.5 px-1.5 text-right text-orange-300 border-r border-slate-800 font-mono text-2xs">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}₫
                 </td>
-                <td className="py-3 px-3 text-right text-emerald-400 font-black text-sm bg-slate-950">
+                <td className="py-2.5 px-2 text-right text-emerald-400 font-black text-xs sm:text-sm bg-slate-950 whitespace-nowrap">
                   {formatNumber(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}₫
                 </td>
-                <td className="py-3 px-2 text-center text-slate-500 text-2xs">-</td>
+                <td className="py-2.5 px-1 text-center text-slate-500 text-2xs">-</td>
               </tr>
             </tfoot>
           </table>

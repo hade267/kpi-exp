@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Header } from './components/Header';
-import { Sidebar, MainSection } from './components/Sidebar';
+import { MainSection } from './components/Sidebar';
 import { PersonalLookupView } from './components/PersonalLookupView';
 import { PersonnelTable } from './components/PersonnelTable';
 import { DetailedReconView } from './components/DetailedReconView';
@@ -15,7 +15,6 @@ import { formatHours, formatNumber, formatPercent } from './utils/formatters';
 
 export default function App() {
   const [currentSection, setCurrentSection] = useState<MainSection>('consolidated_salary');
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
 
   const [activeTab, setActiveTab] = useState<'lookup' | 'table' | 'detailed' | 'analytics'>('lookup');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(18); // Default to Nguyễn Thế Hân
@@ -51,25 +50,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Left Sidebar Navigation */}
-      <Sidebar
-        currentSection={currentSection}
-        onSelectSection={(sec) => {
-          setCurrentSection(sec);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        isMobileOpen={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        egoPassHours={currentProjectSummary.totalValidPassDurationHours}
-        includeUploadValid={includeUploadValid}
-      />
-
-      {/* Main Content Area with Desktop Sidebar Offset */}
-      <div className="lg:pl-72 flex flex-col min-h-screen">
+      {/* Main Content Area without Sidebar */}
+      <div className="flex flex-col min-h-screen w-full">
         <Header
           currentSection={currentSection}
           onSelectSection={setCurrentSection}
-          onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           totalPassHours={currentProjectSummary.totalValidPassDurationHours}
@@ -81,7 +66,7 @@ export default function App() {
         {/* Top Project Quick Ticker Banner - Only for EGO section */}
         {currentSection === 'ego_inspection' && (
           <div className="bg-slate-900 text-slate-300 py-2 px-4 text-xs border-b border-slate-800 no-print">
-            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span className="font-semibold text-white">DỰ ÁN EGO GIAI ĐOẠN II</span>
@@ -116,7 +101,7 @@ export default function App() {
         )}
 
         {/* Main Content Body */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="flex-1 w-full px-3 sm:px-6 lg:px-8 py-5">
           {currentSection === 'ego_inspection' ? (
             <>
               {activeTab === 'lookup' && (
@@ -177,7 +162,7 @@ export default function App() {
 
         {/* Footer */}
         <footer className="bg-white border-t border-slate-200 mt-12 py-5 text-xs text-slate-500 no-print">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="w-full px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Wallet className="w-4 h-4 text-emerald-600" />
               <span>Bảng tổng hợp công & thù lao (VIN - EGO - NUTELLA) • 36 nhân sự</span>
