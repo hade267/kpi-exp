@@ -43,6 +43,16 @@ export const ConsolidatedSalaryModal: React.FC<ConsolidatedSalaryModalProps> = (
         `• KPI EGO: ${person.kpiEgoHours} giờ × 50.000 đ = ${formatCurrencyVND(person.kpiEgoSalary || 0)}`
       );
     }
+    if (person.kpiNutellaHours) {
+      lines.push(
+        `• KPI NUTELLA: ${person.kpiNutellaHours} giờ × 7.000 đ = ${formatCurrencyVND(person.kpiNutellaSalary || 0)}`
+      );
+    }
+    if (person.kpiQaNutellaHours) {
+      lines.push(
+        `• KPI QA NUTELLA: ${person.kpiQaNutellaHours} giờ × 2.000 đ = ${formatCurrencyVND(person.kpiQaNutellaSalary || 0)}`
+      );
+    }
     if (person.workdaysVin) {
       lines.push(
         `• Lương cứng VIN: ${person.workdaysVin} ngày × 153.000 đ = ${formatCurrencyVND(person.fixedSalaryVin || 0)}`
@@ -169,11 +179,57 @@ export const ConsolidatedSalaryModal: React.FC<ConsolidatedSalaryModalProps> = (
               </div>
             </div>
 
-            {/* LƯƠNG CỨNG NUTELLA */}
+            {/* KPI NUTELLA */}
             <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-1.5 font-semibold text-slate-900 text-xs">
                   <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span>KPI NUTELLA (7.000 đ/h)</span>
+                </div>
+                <div className="text-2xs text-slate-500 mt-0.5">
+                  {person.kpiNutellaHours ? `${person.kpiNutellaHours} giờ tự ghi / đối soát` : 'Không phát sinh giờ'}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-bold font-mono text-slate-900">
+                  {person.kpiNutellaSalary ? formatCurrencyVND(person.kpiNutellaSalary) : '-'}
+                </div>
+                {person.kpiNutellaHours && (
+                  <div className="text-3xs text-slate-500 font-mono">
+                    {person.kpiNutellaHours}h × 7k
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* KPI QA NUTELLA */}
+            <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-1.5 font-semibold text-slate-900 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                  <span>KPI QA NUTELLA (2.000 đ/h)</span>
+                </div>
+                <div className="text-2xs text-slate-500 mt-0.5">
+                  {person.kpiQaNutellaHours ? `${person.kpiQaNutellaHours} giờ QA kiểm định` : 'Không phát sinh giờ'}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-bold font-mono text-slate-900">
+                  {person.kpiQaNutellaSalary ? formatCurrencyVND(person.kpiQaNutellaSalary) : '-'}
+                </div>
+                {person.kpiQaNutellaHours && (
+                  <div className="text-3xs text-slate-500 font-mono">
+                    {person.kpiQaNutellaHours}h × 2k
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* LƯƠNG CỨNG NUTELLA */}
+            <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-1.5 font-semibold text-slate-900 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-orange-500"></span>
                   <span>Lương Cứng NUTELLA (166.000 đ/ngày)</span>
                 </div>
                 <div className="text-2xs text-slate-500 mt-0.5">
@@ -218,7 +274,7 @@ export const ConsolidatedSalaryModal: React.FC<ConsolidatedSalaryModalProps> = (
 
           {/* Formula Note */}
           <div className="p-3 bg-slate-100 rounded-xl border border-slate-200 text-2xs text-slate-600 font-mono">
-            <strong>Công thức:</strong> Tổng = (KPI VIN × 50k) + (KPI EGO × 50k) + (Công VIN × 153k) + (Công Nutella × 166k)
+            <strong>Công thức:</strong> Tổng = (KPI VIN × 50k) + (KPI EGO × 50k) + (KPI Nutella × 7k) + (KPI QA × 2k) + (Công VIN × 153k) + (Công Nutella × 166k)
           </div>
         </div>
 

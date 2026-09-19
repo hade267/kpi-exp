@@ -21,7 +21,9 @@ import {
   Building2,
   Users,
   FolderOpen,
-  ExternalLink
+  ExternalLink,
+  ShieldAlert,
+  Sparkles
 } from 'lucide-react';
 import { DRIVE_LINKS } from '../data/driveLinks';
 
@@ -32,6 +34,10 @@ type SortColumn =
   | 'kpiVinSalary'
   | 'kpiEgoHours'
   | 'kpiEgoSalary'
+  | 'kpiNutellaHours'
+  | 'kpiNutellaSalary'
+  | 'kpiQaNutellaHours'
+  | 'kpiQaNutellaSalary'
   | 'workdaysVin'
   | 'fixedSalaryVin'
   | 'workdaysNutella'
@@ -80,7 +86,12 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
         (item) => (item.kpiVinHours || 0) > 0 || (item.workdaysVin || 0) > 0
       );
     } else if (filterProject === 'nutella') {
-      result = result.filter((item) => (item.workdaysNutella || 0) > 0);
+      result = result.filter(
+        (item) =>
+          (item.workdaysNutella || 0) > 0 ||
+          (item.kpiNutellaHours || 0) > 0 ||
+          (item.kpiQaNutellaHours || 0) > 0
+      );
     } else if (filterProject === 'high_earner') {
       result = result.filter((item) => item.totalSalary >= 4000000);
     }
@@ -103,20 +114,24 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
     return result;
   }, [searchTerm, filterProject, sortCol, sortAsc]);
 
-  // Export CSV function
+  // Export CSV function with 14 columns matching exactly
   const handleExportCSV = () => {
     const headers = [
       'STT',
-      'Họ và tên',
-      'KPI VIN (h)',
-      'LƯƠNG KPI VIN (VNĐ)',
-      'KPI EGO (h)',
-      'LƯƠNG KPI EGO (VNĐ)',
+      'Tên',
+      'KPI VIN',
+      'LƯƠNG KPI VIN',
+      'KPI EGO',
+      'LƯƠNG KPI EGO',
+      'KPI NUTELLA',
+      'LƯƠNG KPI NUTELLA',
+      'KPI QA NUTELLA',
+      'LƯƠNG QA NUTELLA',
       'NGÀY CÔNG VIN',
-      'LƯƠNG CỨNG VIN (VNĐ)',
+      'LƯƠNG CỨNG VIN',
       'NGÀY CÔNG NUTELLA',
-      'LƯƠNG CỨNG NUTELLA (VNĐ)',
-      'TỔNG LƯƠNG (VNĐ)',
+      'LƯƠNG CỨNG NUTELLA',
+      'TỔNG LƯƠNG',
     ];
 
     const rows = CONSOLIDATED_SALARY_DATA.map((item) => [
@@ -126,6 +141,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
       item.kpiVinSalary ?? '',
       item.kpiEgoHours ?? '',
       item.kpiEgoSalary ?? '',
+      item.kpiNutellaHours ?? '',
+      item.kpiNutellaSalary ?? '',
+      item.kpiQaNutellaHours ?? '',
+      item.kpiQaNutellaSalary ?? '',
       item.workdaysVin ?? '',
       item.fixedSalaryVin ?? '',
       item.workdaysNutella ?? '',
@@ -140,6 +159,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
       CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary,
       CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours,
       CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaHours,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaSalary,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaHours,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaSalary,
       CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin,
       CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin,
       CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella,
@@ -155,11 +178,13 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
         totalRow.join(','),
         '',
         'BẢNG ĐƠN GIÁ CƠ BẢN ÁP DỤNG,',
-        'Tên Job,Đơn giá (VNĐ)',
-        'KPI VIN,50000',
-        'KPI EGO,50000',
-        'LƯƠNG CỨNG VIN,153000',
-        'LƯƠNG CỨNG NUTELLA,166000',
+        'Tên Hạng Mục,Đơn giá (VNĐ),Ghi chú',
+        'KPI VIN,50000,50.000 đ/giờ Pass nhiệm vụ VIN',
+        'KPI EGO,50000,50.000 đ/giờ Pass nhiệm vụ EGO (Đã gồm Valid Upload)',
+        'KPI NUTELLA,7000,7.000 đ/giờ thời lượng tự ghi sản xuất Nutella',
+        'KPI QA NUTELLA,2000,2.000 đ/giờ kiểm định chất lượng (QA) Nutella',
+        'LƯƠNG CỨNG VIN,153000,153.000 đ/ngày công dự án VIN',
+        'LƯƠNG CỨNG NUTELLA,166000,166.000 đ/ngày công quy đổi dự án Nutella',
       ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -172,37 +197,65 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
     document.body.removeChild(link);
   };
 
-  // Copy TSV for Excel
+  // Copy TSV for Excel / Google Sheets
   const handleCopyTSV = () => {
     const headers = [
-      'STT',
-      'Họ và tên',
-      'KPI VIN (h)',
-      'LƯƠNG KPI VIN (VNĐ)',
-      'KPI EGO (h)',
-      'LƯƠNG KPI EGO (VNĐ)',
+      'Tên',
+      'KPI VIN',
+      'LƯƠNG KPI VIN',
+      'KPI EGO',
+      'LƯƠNG KPI EGO',
+      'KPI NUTELLA',
+      'LƯƠNG KPI NUTELLA',
+      'KPI QA NUTELLA',
+      'LƯƠNG QA NUTELLA',
       'NGÀY CÔNG VIN',
-      'LƯƠNG CỨNG VIN (VNĐ)',
+      'LƯƠNG CỨNG VIN',
       'NGÀY CÔNG NUTELLA',
-      'LƯƠNG CỨNG NUTELLA (VNĐ)',
-      'TỔNG LƯƠNG (VNĐ)',
+      'LƯƠNG CỨNG NUTELLA',
+      'TỔNG LƯƠNG',
     ];
 
     const rows = processedData.map((item) => [
-      item.stt,
       item.name,
-      item.kpiVinHours ?? '',
-      item.kpiVinSalary ?? '',
-      item.kpiEgoHours ?? '',
-      item.kpiEgoSalary ?? '',
-      item.workdaysVin ?? '',
-      item.fixedSalaryVin ?? '',
-      item.workdaysNutella ?? '',
-      item.fixedSalaryNutella ?? '',
-      item.totalSalary,
+      item.kpiVinHours !== null ? item.kpiVinHours : '',
+      item.kpiVinSalary !== null ? `${formatNumber(item.kpiVinSalary)}₫` : '0₫',
+      item.kpiEgoHours !== null ? item.kpiEgoHours : '',
+      item.kpiEgoSalary !== null ? `${formatNumber(item.kpiEgoSalary)}₫` : '0₫',
+      item.kpiNutellaHours !== null ? item.kpiNutellaHours : '',
+      item.kpiNutellaSalary !== null ? `${formatNumber(item.kpiNutellaSalary)}₫` : '0₫',
+      item.kpiQaNutellaHours !== null ? item.kpiQaNutellaHours : '',
+      item.kpiQaNutellaSalary !== null ? `${formatNumber(item.kpiQaNutellaSalary)}₫` : '0₫',
+      item.workdaysVin !== null ? item.workdaysVin : '',
+      item.fixedSalaryVin !== null ? `${formatNumber(item.fixedSalaryVin)}₫` : '0₫',
+      item.workdaysNutella !== null ? item.workdaysNutella.toFixed(2) : '',
+      item.fixedSalaryNutella !== null ? `${formatNumber(item.fixedSalaryNutella)}₫` : '0₫',
+      `${formatNumber(item.totalSalary)}₫`,
     ]);
 
-    const tsvContent = [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
+    const totalRow = [
+      'TỔNG CỘNG',
+      CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours,
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary)}₫`,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours,
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}₫`,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaHours,
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaSalary)}₫`,
+      CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaHours,
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaSalary)}₫`,
+      CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin,
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin)}₫`,
+      CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toFixed(2),
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}₫`,
+      `${formatNumber(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}₫`,
+    ];
+
+    const tsvContent = [
+      headers.join('\t'),
+      ...rows.map((r) => r.join('\t')),
+      totalRow.join('\t'),
+    ].join('\n');
+
     navigator.clipboard.writeText(tsvContent);
     setCopiedTSV(true);
     setTimeout(() => setCopiedTSV(false), 2000);
@@ -214,121 +267,6 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
 
   return (
     <div className="space-y-4">
-      {/* 4 Summary Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 no-print">
-        {/* Card 1: Grand Total */}
-        <div className="bg-white rounded-2xl p-4 border border-emerald-200/80 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-2xs font-bold uppercase tracking-wider text-emerald-800">
-              Tổng Ngân Sách Thực Lĩnh
-            </span>
-            <div className="text-lg sm:text-xl font-mono font-bold text-slate-900">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}
-            </div>
-            <p className="text-2xs text-slate-500">
-              Chi trả đầy đủ cho <strong>{CONSOLIDATED_SALARY_TOTALS.personnelCount} nhân sự</strong>
-            </p>
-          </div>
-          <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100">
-            <Wallet className="w-5 h-5" />
-          </div>
-        </div>
-
-        {/* Card 2: KPI EGO */}
-        <div className="bg-white rounded-2xl p-4 border border-indigo-200/80 shadow-xs flex flex-col justify-between space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-2xs font-bold uppercase tracking-wider text-indigo-800">
-                KPI Dự Án EGO (50k/h)
-              </span>
-              <div className="text-lg sm:text-xl font-mono font-bold text-indigo-950">
-                {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}
-              </div>
-              <p className="text-2xs text-slate-500">
-                Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toFixed(2)}h</strong> Pass nghiệm thu EGO
-              </p>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 border border-indigo-100">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-          <a
-            id="card-link-drive-ego"
-            href={DRIVE_LINKS.egoInspection}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-2xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 pt-1 border-t border-indigo-100 cursor-pointer self-start"
-            title="Mở thư mục Google Drive đối soát EGO"
-          >
-            <FolderOpen className="w-3 h-3 text-indigo-500" />
-            <span>Thư mục đối soát EGO (Drive)</span>
-            <ExternalLink className="w-2.5 h-2.5 opacity-70" />
-          </a>
-        </div>
-
-        {/* Card 3: Lương Cứng NUTELLA */}
-        <div className="bg-white rounded-2xl p-4 border border-amber-200/80 shadow-xs flex flex-col justify-between space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-2xs font-bold uppercase tracking-wider text-amber-800">
-                Lương Cứng NUTELLA (166k/công)
-              </span>
-              <div className="text-lg sm:text-xl font-mono font-bold text-amber-950">
-                {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}
-              </div>
-              <p className="text-2xs text-slate-500">
-                Tổng <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toFixed(1)} ngày công</strong> dự án Nutella
-              </p>
-            </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 border border-amber-100">
-              <Calendar className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2 pt-1 border-t border-amber-100 flex-wrap">
-            {onSwitchSection && (
-              <button
-                type="button"
-                onClick={() => onSwitchSection('nutella_timesheet')}
-                className="text-2xs font-bold text-amber-700 hover:text-amber-800 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>Bảng chấm công 3 GĐ</span>
-                <span className="text-xs">→</span>
-              </button>
-            )}
-            <a
-              id="card-link-drive-nutella"
-              href={DRIVE_LINKS.nutellaInspection}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-2xs font-bold text-amber-700 hover:text-amber-900 hover:underline flex items-center gap-1 cursor-pointer"
-              title="Mở thư mục Google Drive đối soát Nutella"
-            >
-              <FolderOpen className="w-3 h-3 text-amber-500" />
-              <span>Drive Nutella</span>
-              <ExternalLink className="w-2.5 h-2.5 opacity-70" />
-            </a>
-          </div>
-        </div>
-
-        {/* Card 4: Dự Án VIN */}
-        <div className="bg-white rounded-2xl p-4 border border-cyan-200/80 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-2xs font-bold uppercase tracking-wider text-cyan-800">
-              Tổng Dự Án VIN (KPI + Cứng)
-            </span>
-            <div className="text-lg sm:text-xl font-mono font-bold text-cyan-950">
-              {formatCurrencyVND(CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary + CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin)}
-            </div>
-            <p className="text-2xs text-slate-500">
-              <strong>{CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours.toFixed(2)}h</strong> KPI + <strong>{CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin.toFixed(1)} công</strong> (153k)
-            </p>
-          </div>
-          <div className="w-11 h-11 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center flex-shrink-0 border border-cyan-100">
-            <Building2 className="w-5 h-5" />
-          </div>
-        </div>
-      </div>
-
       {/* Filter, Search & Export Bar */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-3 no-print">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
@@ -357,16 +295,6 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
               Tất cả (36)
             </button>
             <button
-              onClick={() => setFilterProject('ego')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                filterProject === 'ego'
-                  ? 'bg-indigo-600 text-white font-bold'
-                  : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
-              }`}
-            >
-              Có làm EGO
-            </button>
-            <button
               onClick={() => setFilterProject('nutella')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filterProject === 'nutella'
@@ -375,6 +303,16 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
               }`}
             >
               Có làm Nutella
+            </button>
+            <button
+              onClick={() => setFilterProject('ego')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                filterProject === 'ego'
+                  ? 'bg-indigo-600 text-white font-bold'
+                  : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+              }`}
+            >
+              Có làm EGO
             </button>
             <button
               onClick={() => setFilterProject('vin')}
@@ -409,10 +347,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                   ? 'bg-emerald-600 text-white border-emerald-600'
                   : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
               }`}
-              title="Sao chép dạng bảng TSV để dán trực tiếp vào Microsoft Excel hoặc Google Sheets"
+              title="Sao chép toàn bộ bảng TSV để dán trực tiếp vào Google Sheets / Microsoft Excel"
             >
               {copiedTSV ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedTSV ? 'Đã chép' : 'Copy Excel'}</span>
+              <span>{copiedTSV ? 'Đã chép Excel' : 'Copy Excel'}</span>
             </button>
 
             <button
@@ -436,11 +374,13 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-2xs text-slate-500 pt-1 border-t border-slate-100">
+        <div className="flex items-center justify-between text-2xs text-slate-500 pt-1 border-t border-slate-100 flex-wrap gap-2">
           <span>
             Đang hiển thị <strong>{processedData.length}</strong> / 36 nhân sự
           </span>
-          <span>* Nhấp vào từng dòng để xem phiếu chi tiết và công thức tính</span>
+          <span className="text-slate-400">
+            * Bảng lương tổng hợp 14 cột chi tiết: VIN (50k/153k) • EGO (50k) • NUTELLA (7k/2k/166k)
+          </span>
         </div>
       </div>
 
@@ -450,35 +390,41 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               {/* Top grouping row */}
-              <tr className="bg-slate-100 text-slate-700 border-b border-slate-300 font-bold text-2xs uppercase tracking-wider">
+              <tr className="bg-slate-100 text-slate-700 border-b border-slate-300 font-bold text-2xs uppercase tracking-wider select-none">
                 <th colSpan={2} className="py-2.5 px-3 border-r border-slate-300">
                   Nhân Sự
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-blue-50/80 text-blue-900 border-r border-slate-300">
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-blue-50/90 text-blue-900 border-r border-slate-300">
                   KPI VIN (50k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-indigo-50/80 text-indigo-900 border-r border-slate-300">
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-indigo-50/90 text-indigo-900 border-r border-slate-300">
                   KPI EGO (50k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-cyan-50/80 text-cyan-900 border-r border-slate-300">
-                  Lương Cứng VIN (153k/ngày)
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-amber-50/90 text-amber-900 border-r border-slate-300">
+                  KPI NUTELLA (7k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-amber-50/80 text-amber-900 border-r border-slate-300">
-                  Lương Cứng NUTELLA (166k/ngày)
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-purple-50/90 text-purple-900 border-r border-slate-300">
+                  KPI QA NUTELLA (2k/h)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 text-center bg-emerald-100/90 text-emerald-950 font-extrabold">
-                  Tổng Nhận & Thao Tác
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-cyan-50/90 text-cyan-900 border-r border-slate-300">
+                  LƯƠNG CỨNG VIN (153k/ngày)
+                </th>
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-orange-50/90 text-orange-900 border-r border-slate-300">
+                  LƯƠNG CỨNG NUTELLA (166k/ngày)
+                </th>
+                <th colSpan={2} className="py-2.5 px-3 text-center bg-emerald-100 text-emerald-950 font-black">
+                  TỔNG LƯƠNG & PHIẾU
                 </th>
               </tr>
 
               {/* Sub header row */}
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-2xs font-semibold">
+              <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-2xs font-semibold select-none">
                 {/* STT */}
                 <th
                   onClick={() => handleSort('stt')}
-                  className="py-2.5 px-3 w-12 cursor-pointer hover:bg-slate-100 transition-colors"
+                  className="py-2.5 px-2.5 w-10 text-center cursor-pointer hover:bg-slate-100 transition-colors"
                 >
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center justify-center gap-0.5">
                     <span>STT</span>
                     {sortCol === 'stt' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
                   </div>
@@ -487,10 +433,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* Name */}
                 <th
                   onClick={() => handleSort('name')}
-                  className="py-2.5 px-3 min-w-[160px] cursor-pointer hover:bg-slate-100 transition-colors border-r border-slate-200"
+                  className="py-2.5 px-3 min-w-[150px] cursor-pointer hover:bg-slate-100 transition-colors border-r border-slate-200"
                 >
                   <div className="flex items-center gap-1">
-                    <span>Họ và tên</span>
+                    <span>Tên</span>
                     {sortCol === 'name' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
                   </div>
                 </th>
@@ -498,10 +444,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* KPI VIN: hours */}
                 <th
                   onClick={() => handleSort('kpiVinHours')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-blue-100/50 bg-blue-50/30 transition-colors"
+                  className="py-2.5 px-2.5 text-right min-w-[70px] cursor-pointer hover:bg-blue-100/60 bg-blue-50/30 transition-colors"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Giờ (h)</span>
+                    <span>KPI VIN</span>
                     {sortCol === 'kpiVinHours' && <ArrowUpDown className="w-3 h-3 text-blue-600" />}
                   </div>
                 </th>
@@ -509,10 +455,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* KPI VIN: salary */}
                 <th
                   onClick={() => handleSort('kpiVinSalary')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-blue-100/50 bg-blue-50/30 transition-colors border-r border-slate-200"
+                  className="py-2.5 px-2.5 text-right min-w-[100px] cursor-pointer hover:bg-blue-100/60 bg-blue-50/30 transition-colors border-r border-slate-200"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Lương (VNĐ)</span>
+                    <span>LƯƠNG VIN</span>
                     {sortCol === 'kpiVinSalary' && <ArrowUpDown className="w-3 h-3 text-blue-600" />}
                   </div>
                 </th>
@@ -520,10 +466,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* KPI EGO: hours */}
                 <th
                   onClick={() => handleSort('kpiEgoHours')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-indigo-100/50 bg-indigo-50/30 transition-colors"
+                  className="py-2.5 px-2.5 text-right min-w-[75px] cursor-pointer hover:bg-indigo-100/60 bg-indigo-50/30 transition-colors"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Giờ (h)</span>
+                    <span>KPI EGO</span>
                     {sortCol === 'kpiEgoHours' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
                   </div>
                 </th>
@@ -531,21 +477,65 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* KPI EGO: salary */}
                 <th
                   onClick={() => handleSort('kpiEgoSalary')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-indigo-100/50 bg-indigo-50/30 transition-colors border-r border-slate-200"
+                  className="py-2.5 px-2.5 text-right min-w-[105px] cursor-pointer hover:bg-indigo-100/60 bg-indigo-50/30 transition-colors border-r border-slate-200"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Lương (VNĐ)</span>
+                    <span>LƯƠNG EGO</span>
                     {sortCol === 'kpiEgoSalary' && <ArrowUpDown className="w-3 h-3 text-indigo-600" />}
+                  </div>
+                </th>
+
+                {/* KPI NUTELLA: hours */}
+                <th
+                  onClick={() => handleSort('kpiNutellaHours')}
+                  className="py-2.5 px-2.5 text-right min-w-[90px] cursor-pointer hover:bg-amber-100/60 bg-amber-50/30 transition-colors"
+                >
+                  <div className="flex items-center justify-end gap-1">
+                    <span>KPI NUTELLA</span>
+                    {sortCol === 'kpiNutellaHours' && <ArrowUpDown className="w-3 h-3 text-amber-600" />}
+                  </div>
+                </th>
+
+                {/* KPI NUTELLA: salary */}
+                <th
+                  onClick={() => handleSort('kpiNutellaSalary')}
+                  className="py-2.5 px-2.5 text-right min-w-[110px] cursor-pointer hover:bg-amber-100/60 bg-amber-50/30 transition-colors border-r border-slate-200"
+                >
+                  <div className="flex items-center justify-end gap-1">
+                    <span>LƯƠNG NUTELLA</span>
+                    {sortCol === 'kpiNutellaSalary' && <ArrowUpDown className="w-3 h-3 text-amber-600" />}
+                  </div>
+                </th>
+
+                {/* KPI QA NUTELLA: hours */}
+                <th
+                  onClick={() => handleSort('kpiQaNutellaHours')}
+                  className="py-2.5 px-2.5 text-right min-w-[85px] cursor-pointer hover:bg-purple-100/60 bg-purple-50/30 transition-colors"
+                >
+                  <div className="flex items-center justify-end gap-1">
+                    <span>KPI QA</span>
+                    {sortCol === 'kpiQaNutellaHours' && <ArrowUpDown className="w-3 h-3 text-purple-600" />}
+                  </div>
+                </th>
+
+                {/* KPI QA NUTELLA: salary */}
+                <th
+                  onClick={() => handleSort('kpiQaNutellaSalary')}
+                  className="py-2.5 px-2.5 text-right min-w-[105px] cursor-pointer hover:bg-purple-100/60 bg-purple-50/30 transition-colors border-r border-slate-200"
+                >
+                  <div className="flex items-center justify-end gap-1">
+                    <span>LƯƠNG QA</span>
+                    {sortCol === 'kpiQaNutellaSalary' && <ArrowUpDown className="w-3 h-3 text-purple-600" />}
                   </div>
                 </th>
 
                 {/* WORKDAYS VIN */}
                 <th
                   onClick={() => handleSort('workdaysVin')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-cyan-100/50 bg-cyan-50/30 transition-colors"
+                  className="py-2.5 px-2.5 text-right min-w-[70px] cursor-pointer hover:bg-cyan-100/60 bg-cyan-50/30 transition-colors"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Ngày</span>
+                    <span>CÔNG VIN</span>
                     {sortCol === 'workdaysVin' && <ArrowUpDown className="w-3 h-3 text-cyan-600" />}
                   </div>
                 </th>
@@ -553,10 +543,10 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* FIXED SALARY VIN */}
                 <th
                   onClick={() => handleSort('fixedSalaryVin')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-cyan-100/50 bg-cyan-50/30 transition-colors border-r border-slate-200"
+                  className="py-2.5 px-2.5 text-right min-w-[95px] cursor-pointer hover:bg-cyan-100/60 bg-cyan-50/30 transition-colors border-r border-slate-200"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Lương (VNĐ)</span>
+                    <span>CỨNG VIN</span>
                     {sortCol === 'fixedSalaryVin' && <ArrowUpDown className="w-3 h-3 text-cyan-600" />}
                   </div>
                 </th>
@@ -564,64 +554,66 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                 {/* WORKDAYS NUTELLA */}
                 <th
                   onClick={() => handleSort('workdaysNutella')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-amber-100/50 bg-amber-50/30 transition-colors"
+                  className="py-2.5 px-2.5 text-right min-w-[75px] cursor-pointer hover:bg-orange-100/60 bg-orange-50/30 transition-colors"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Ngày</span>
-                    {sortCol === 'workdaysNutella' && <ArrowUpDown className="w-3 h-3 text-amber-600" />}
+                    <span>CÔNG NUT.</span>
+                    {sortCol === 'workdaysNutella' && <ArrowUpDown className="w-3 h-3 text-orange-600" />}
                   </div>
                 </th>
 
                 {/* FIXED SALARY NUTELLA */}
                 <th
                   onClick={() => handleSort('fixedSalaryNutella')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-amber-100/50 bg-amber-50/30 transition-colors border-r border-slate-200"
+                  className="py-2.5 px-2.5 text-right min-w-[105px] cursor-pointer hover:bg-orange-100/60 bg-orange-50/30 transition-colors border-r border-slate-200"
                 >
                   <div className="flex items-center justify-end gap-1">
-                    <span>Lương (VNĐ)</span>
-                    {sortCol === 'fixedSalaryNutella' && <ArrowUpDown className="w-3 h-3 text-amber-600" />}
+                    <span>CỨNG NUT.</span>
+                    {sortCol === 'fixedSalaryNutella' && <ArrowUpDown className="w-3 h-3 text-orange-600" />}
                   </div>
                 </th>
 
                 {/* TOTAL SALARY */}
                 <th
                   onClick={() => handleSort('totalSalary')}
-                  className="py-2.5 px-3 text-right cursor-pointer hover:bg-emerald-100 bg-emerald-50/60 transition-colors"
+                  className="py-2.5 px-3 text-right min-w-[125px] cursor-pointer hover:bg-emerald-200 bg-emerald-100 text-emerald-950 font-black transition-colors"
                 >
-                  <div className="flex items-center justify-end gap-1 font-bold text-emerald-900">
+                  <div className="flex items-center justify-end gap-1">
                     <span>TỔNG LƯƠNG</span>
-                    {sortCol === 'totalSalary' && <ArrowUpDown className="w-3 h-3 text-emerald-700" />}
+                    {sortCol === 'totalSalary' && <ArrowUpDown className="w-3 h-3 text-emerald-800" />}
                   </div>
                 </th>
 
                 {/* Action */}
-                <th className="py-2.5 px-3 text-center bg-slate-50 w-16">
+                <th className="py-2.5 px-2 text-center bg-slate-50 w-14">
                   <span>Phiếu</span>
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-200 font-mono">
-              {processedData.map((item) => {
+            <tbody className="divide-y divide-slate-100 font-mono text-2xs">
+              {processedData.map((item, index) => {
                 const isHighEarner = item.totalSalary >= 4000000;
                 return (
                   <tr
                     key={item.stt}
                     onClick={() => setSelectedPerson(item)}
-                    className="hover:bg-slate-50/90 transition-colors cursor-pointer group"
+                    className={`hover:bg-amber-50/40 transition-colors cursor-pointer group ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'
+                    }`}
                   >
                     {/* STT */}
-                    <td className="py-2.5 px-3 text-slate-500 font-mono text-center">
+                    <td className="py-2 px-2.5 text-slate-400 text-center font-mono text-3xs">
                       {item.stt}
                     </td>
 
-                    {/* Họ và tên */}
-                    <td className="py-2.5 px-3 font-sans font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors border-r border-slate-200">
-                      <div className="flex items-center gap-1.5">
-                        <span>{item.name}</span>
+                    {/* Tên */}
+                    <td className="py-2 px-3 font-sans font-bold text-slate-900 group-hover:text-indigo-600 transition-colors border-r border-slate-200 text-xs">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="truncate">{item.name}</span>
                         {isHighEarner && (
                           <span
-                            className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                            className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"
                             title="Lương trên 4 triệu VNĐ"
                           ></span>
                         )}
@@ -629,102 +621,142 @@ export const ConsolidatedSalaryView: React.FC<ConsolidatedSalaryViewProps> = ({ 
                     </td>
 
                     {/* KPI VIN: h */}
-                    <td className="py-2.5 px-3 text-right text-slate-700 bg-blue-50/10">
-                      {item.kpiVinHours !== null ? item.kpiVinHours.toFixed(2) : '-'}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-blue-50/10">
+                      {item.kpiVinHours !== null ? item.kpiVinHours.toLocaleString('vi-VN') : ''}
                     </td>
 
-                    {/* KPI VIN: salary */}
-                    <td className="py-2.5 px-3 text-right text-slate-700 bg-blue-50/10 border-r border-slate-200">
-                      {item.kpiVinSalary !== null ? formatNumber(item.kpiVinSalary) : '-'}
+                    {/* LƯƠNG KPI VIN */}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-blue-50/10 border-r border-slate-200">
+                      {item.kpiVinSalary ? `${formatNumber(item.kpiVinSalary)}₫` : '0₫'}
                     </td>
 
                     {/* KPI EGO: h */}
-                    <td className="py-2.5 px-3 text-right font-medium text-slate-900 bg-indigo-50/10">
-                      {item.kpiEgoHours !== null ? item.kpiEgoHours.toFixed(2) : '-'}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-indigo-50/10">
+                      {item.kpiEgoHours !== null ? item.kpiEgoHours.toLocaleString('vi-VN') : ''}
                     </td>
 
-                    {/* KPI EGO: salary */}
-                    <td className="py-2.5 px-3 text-right font-medium text-indigo-700 bg-indigo-50/10 border-r border-slate-200">
-                      {item.kpiEgoSalary !== null ? formatNumber(item.kpiEgoSalary) : '-'}
+                    {/* LƯƠNG KPI EGO */}
+                    <td className="py-2 px-2.5 text-right font-medium text-indigo-700 bg-indigo-50/10 border-r border-slate-200">
+                      {item.kpiEgoSalary ? `${formatNumber(item.kpiEgoSalary)}₫` : '0₫'}
+                    </td>
+
+                    {/* KPI NUTELLA: h */}
+                    <td className="py-2 px-2.5 text-right font-medium text-slate-800 bg-amber-50/10">
+                      {item.kpiNutellaHours !== null ? item.kpiNutellaHours.toLocaleString('vi-VN') : ''}
+                    </td>
+
+                    {/* LƯƠNG KPI NUTELLA */}
+                    <td className="py-2 px-2.5 text-right font-semibold text-amber-900 bg-amber-50/10 border-r border-slate-200">
+                      {item.kpiNutellaSalary ? `${formatNumber(item.kpiNutellaSalary)}₫` : '0₫'}
+                    </td>
+
+                    {/* KPI QA NUTELLA: h */}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-purple-50/10">
+                      {item.kpiQaNutellaHours !== null ? item.kpiQaNutellaHours.toLocaleString('vi-VN') : ''}
+                    </td>
+
+                    {/* LƯƠNG QA NUTELLA */}
+                    <td className="py-2 px-2.5 text-right font-medium text-purple-700 bg-purple-50/10 border-r border-slate-200">
+                      {item.kpiQaNutellaSalary ? `${formatNumber(item.kpiQaNutellaSalary)}₫` : '0₫'}
                     </td>
 
                     {/* NGÀY CÔNG VIN */}
-                    <td className="py-2.5 px-3 text-right text-slate-700 bg-cyan-50/10">
-                      {item.workdaysVin !== null ? item.workdaysVin : '-'}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-cyan-50/10">
+                      {item.workdaysVin !== null ? item.workdaysVin.toLocaleString('vi-VN') : ''}
                     </td>
 
                     {/* LƯƠNG CỨNG VIN */}
-                    <td className="py-2.5 px-3 text-right text-slate-700 bg-cyan-50/10 border-r border-slate-200">
-                      {item.fixedSalaryVin !== null ? formatNumber(item.fixedSalaryVin) : '-'}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-cyan-50/10 border-r border-slate-200">
+                      {item.fixedSalaryVin ? `${formatNumber(item.fixedSalaryVin)}₫` : '0₫'}
                     </td>
 
                     {/* NGÀY CÔNG NUTELLA */}
-                    <td className="py-2.5 px-3 text-right font-medium text-slate-900 bg-amber-50/10">
-                      {item.workdaysNutella !== null ? item.workdaysNutella : '-'}
+                    <td className="py-2 px-2.5 text-right text-slate-700 bg-orange-50/10">
+                      {item.workdaysNutella !== null ? item.workdaysNutella.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
                     </td>
 
                     {/* LƯƠNG CỨNG NUTELLA */}
-                    <td className="py-2.5 px-3 text-right font-medium text-amber-800 bg-amber-50/10 border-r border-slate-200">
-                      {item.fixedSalaryNutella !== null ? formatNumber(item.fixedSalaryNutella) : '-'}
+                    <td className="py-2 px-2.5 text-right font-medium text-orange-800 bg-orange-50/10 border-r border-slate-200">
+                      {item.fixedSalaryNutella ? `${formatNumber(item.fixedSalaryNutella)}₫` : '0₫'}
                     </td>
 
                     {/* TỔNG LƯƠNG */}
-                    <td className="py-2.5 px-3 text-right font-bold text-emerald-700 bg-emerald-50/40 text-xs sm:text-sm">
-                      {formatNumber(item.totalSalary)} đ
+                    <td className="py-2 px-3 text-right font-black text-emerald-700 bg-emerald-50/50 text-xs sm:text-sm">
+                      {formatNumber(item.totalSalary)}₫
                     </td>
 
                     {/* Action */}
-                    <td className="py-2.5 px-3 text-center">
+                    <td className="py-2 px-2 text-center">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedPerson(item);
                         }}
-                        className="px-2 py-1 rounded text-3xs font-sans font-semibold bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors"
+                        className="px-1.5 py-0.5 rounded text-3xs font-sans font-semibold bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-600 transition-colors"
                       >
-                        Xem
+                        Phiếu
                       </button>
                     </td>
                   </tr>
                 );
               })}
+
+              {processedData.length === 0 && (
+                <tr>
+                  <td colSpan={16} className="py-8 text-center text-slate-400 text-xs">
+                    Không tìm thấy nhân sự phù hợp với tiêu chí lọc.
+                  </td>
+                </tr>
+              )}
             </tbody>
 
             {/* Total Footer Row */}
             <tfoot className="bg-slate-900 text-white font-mono font-bold text-xs border-t-2 border-slate-900">
               <tr>
-                <td className="py-3 px-3 text-center">-</td>
-                <td className="py-3 px-3 font-sans uppercase tracking-wider text-xs border-r border-slate-800">
+                <td className="py-3 px-2.5 text-center text-slate-500 text-2xs">-</td>
+                <td className="py-3 px-3 font-sans uppercase tracking-wider text-xs border-r border-slate-800 text-slate-200 font-black">
                   TỔNG CỘNG
                 </td>
-                <td className="py-3 px-3 text-right text-blue-300">
-                  {CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours.toFixed(2)}
+                <td className="py-3 px-2.5 text-right text-blue-300 font-mono text-2xs">
+                  {CONSOLIDATED_SALARY_TOTALS.totalKpiVinHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-3 text-right text-blue-300 border-r border-slate-800">
-                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary)}
+                <td className="py-3 px-2.5 text-right text-blue-300 border-r border-slate-800 font-mono text-2xs">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiVinSalary)}₫
                 </td>
-                <td className="py-3 px-3 text-right text-indigo-300">
-                  {CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toFixed(2)}
+                <td className="py-3 px-2.5 text-right text-indigo-300 font-mono text-2xs">
+                  {CONSOLIDATED_SALARY_TOTALS.totalKpiEgoHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-3 text-right text-indigo-300 border-r border-slate-800">
-                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}
+                <td className="py-3 px-2.5 text-right text-indigo-300 border-r border-slate-800 font-mono text-2xs">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiEgoSalary)}₫
                 </td>
-                <td className="py-3 px-3 text-right text-cyan-300">
-                  {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin.toFixed(1)}
+                <td className="py-3 px-2.5 text-right text-amber-300 font-mono text-2xs">
+                  {CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-3 text-right text-cyan-300 border-r border-slate-800">
-                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin)}
+                <td className="py-3 px-2.5 text-right text-amber-300 border-r border-slate-800 font-mono text-2xs">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiNutellaSalary)}₫
                 </td>
-                <td className="py-3 px-3 text-right text-amber-300">
-                  {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toFixed(1)}
+                <td className="py-3 px-2.5 text-right text-purple-300 font-mono text-2xs">
+                  {CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaHours.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-3 text-right text-amber-300 border-r border-slate-800">
-                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}
+                <td className="py-3 px-2.5 text-right text-purple-300 border-r border-slate-800 font-mono text-2xs">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalKpiQaNutellaSalary)}₫
                 </td>
-                <td className="py-3 px-3 text-right text-emerald-400 font-extrabold text-sm">
-                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)} đ
+                <td className="py-3 px-2.5 text-right text-cyan-300 font-mono text-2xs">
+                  {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysVin.toLocaleString('vi-VN')}
                 </td>
-                <td className="py-3 px-3 text-center">-</td>
+                <td className="py-3 px-2.5 text-right text-cyan-300 border-r border-slate-800 font-mono text-2xs">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryVin)}₫
+                </td>
+                <td className="py-3 px-2.5 text-right text-orange-300 font-mono text-2xs">
+                  {CONSOLIDATED_SALARY_TOTALS.totalWorkdaysNutella.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </td>
+                <td className="py-3 px-2.5 text-right text-orange-300 border-r border-slate-800 font-mono text-2xs">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.totalFixedSalaryNutella)}₫
+                </td>
+                <td className="py-3 px-3 text-right text-emerald-400 font-black text-sm bg-slate-950">
+                  {formatNumber(CONSOLIDATED_SALARY_TOTALS.grandTotalSalary)}₫
+                </td>
+                <td className="py-3 px-2 text-center text-slate-500 text-2xs">-</td>
               </tr>
             </tfoot>
           </table>

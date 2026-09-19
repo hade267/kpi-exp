@@ -17,7 +17,11 @@ import {
   Calculator,
   FileSpreadsheet,
   FolderOpen,
-  ExternalLink
+  ExternalLink,
+  Copy,
+  Check,
+  ArrowUpDown,
+  Clock
 } from 'lucide-react';
 import { DRIVE_LINKS } from '../data/driveLinks';
 import {
@@ -25,7 +29,10 @@ import {
   NUTELLA_RULES,
   LABEL_CONVERTED_WORKDAYS_DATA,
   QA_TIMESHEET_DATA,
-  NUTELLA_TIMESHEET_SUMMARY
+  NUTELLA_TIMESHEET_SUMMARY,
+  NUTELLA_EP_REPORT_DATA,
+  NUTELLA_EP_REPORT_TOTALS,
+  NutellaEpReportItem
 } from '../data/nutellaTimesheetData';
 import { formatCurrencyVND } from '../utils/formatters';
 
@@ -33,12 +40,107 @@ interface NutellaTimesheetViewProps {
   onSwitchSection?: (section: 'ego_inspection' | 'consolidated_salary' | 'nutella_timesheet') => void;
 }
 
-type NutellaSubTab = 'converted_workdays' | 'qa_breakdown' | 'rules';
+type NutellaSubTab = 'ep_report' | 'converted_workdays' | 'qa_breakdown' | 'rules';
+
+type EpSortColumn =
+  | 'stt'
+  | 'name'
+  | 'epCount'
+  | 'totalDurationSeconds'
+  | 'totalDurationHours'
+  | 'epZeroDurationCount'
+  | 'salary';
 
 export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSwitchSection }) => {
-  const [activeTab, setActiveTab] = useState<NutellaSubTab>('converted_workdays');
+  const [activeTab, setActiveTab] = useState<NutellaSubTab>('ep_report');
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<'ALL' | 'Label' | 'QA'>('ALL');
+
+  // Sorting state for EP Report table
+  const [epSortCol, setEpSortCol] = useState<EpSortColumn>('stt');
+  const [epSortAsc, setEpSortAsc] = useState<boolean>(true);
+  const [copiedEpTSV, setCopiedEpTSV] = useState<boolean>(false);
+
+  const handleEpSort = (col: EpSortColumn) => {
+    if (epSortCol === col) {
+      setEpSortAsc(!epSortAsc);
+    } else {
+      setEpSortCol(col);
+      setEpSortAsc(col === 'name' || col === 'stt' ? true : false);
+    }
+  };
+
+  // Filtered & Sorted EP Report data
+  const filteredAndSortedEpReport = useMemo(() => {
+    let list = [...NUTELLA_EP_REPORT_DATA];
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      list = list.filter(
+        item => item.name.toLowerCase().includes(q) || item.stt.toString() === q
+      );
+    }
+    list.sort((a, b) => {
+      const valA = a[epSortCol];
+      const valB = b[epSortCol];
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return epSortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+      return epSortAsc ? Number(valA) - Number(valB) : Number(valB) - Number(valA);
+    });
+    return list;
+  }, [searchTerm, epSortCol, epSortAsc]);
+
+  // Copy EP Report as TSV (Tab-Separated Values for Excel/Sheets)
+  const handleCopyEpTSV = () => {
+    const headers = [
+      'STT',
+      'Tên người',
+      'EP trong báo cáo',
+      'Tổng thời lượng (giây)',
+      'Tổng giờ tự ghi',
+      'EP không tính thời gian',
+      'Đơn giá',
+      'Lương'
+    ];
+    const rows = NUTELLA_EP_REPORT_DATA.map(item => [
+      item.stt,
+      item.name,
+      item.epCount,
+      item.totalDurationSeconds.toLocaleString('vi-VN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }),
+      item.totalDurationHours.toLocaleString('vi-VN', {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+      }),
+      item.epZeroDurationCount,
+      '7.000₫',
+      item.salary.toLocaleString('vi-VN') + '₫'
+    ]);
+    const totalRow = [
+      '',
+      'TỔNG CỘNG',
+      NUTELLA_EP_REPORT_TOTALS.totalEpCount,
+      NUTELLA_EP_REPORT_TOTALS.totalDurationSeconds.toLocaleString('vi-VN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }),
+      NUTELLA_EP_REPORT_TOTALS.totalDurationHoursDisplay.toLocaleString('vi-VN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }),
+      NUTELLA_EP_REPORT_TOTALS.totalEpZeroDurationCount,
+      '7.000₫',
+      NUTELLA_EP_REPORT_TOTALS.totalSalary.toLocaleString('vi-VN') + '₫'
+    ];
+    const tsv = [headers.join('\t'), ...rows.map(r => r.join('\t')), totalRow.join('\t')].join(
+      '\n'
+    );
+    navigator.clipboard.writeText(tsv);
+    setCopiedEpTSV(true);
+    setTimeout(() => setCopiedEpTSV(false), 2000);
+  };
 
   // Interactive formula tester
   const [testHours, setTestHours] = useState<number>(12);
@@ -91,7 +193,39 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
   // Export to CSV helper
   const handleExportCSV = () => {
     let csvContent = '';
-    if (activeTab === 'converted_workdays') {
+    if (activeTab === 'ep_report') {
+      const headers = [
+        'STT',
+        'Ten_nguoi',
+        'EP_trong_bao_cao',
+        'Tong_thoi_luong_giay',
+        'Tong_gio_tu_ghi_h',
+        'EP_khong_tinh_thoi_gian',
+        'Don_gia_VND_h',
+        'Luong_VND'
+      ];
+      const rows = NUTELLA_EP_REPORT_DATA.map(item => [
+        item.stt,
+        `"${item.name}"`,
+        item.epCount,
+        item.totalDurationSeconds,
+        item.totalDurationHours,
+        item.epZeroDurationCount,
+        7000,
+        item.salary
+      ]);
+      const totalRow = [
+        '',
+        '"TONG CONG"',
+        NUTELLA_EP_REPORT_TOTALS.totalEpCount,
+        NUTELLA_EP_REPORT_TOTALS.totalDurationSeconds,
+        NUTELLA_EP_REPORT_TOTALS.totalDurationHoursDisplay,
+        NUTELLA_EP_REPORT_TOTALS.totalEpZeroDurationCount,
+        7000,
+        NUTELLA_EP_REPORT_TOTALS.totalSalary
+      ];
+      csvContent = [headers.join(','), ...rows.map(r => r.join(',')), totalRow.join(',')].join('\n');
+    } else if (activeTab === 'converted_workdays') {
       const headers = ['STT', 'Bo_phan', 'Ho_va_ten', ...NUTELLA_DATES, 'Cong_GD1', 'Cong_GD2', 'Cong_GD3', 'TONG_CONG'];
       const rows = LABEL_CONVERTED_WORKDAYS_DATA.map(item => [
         item.stt,
@@ -125,7 +259,7 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `nutella_timesheet_${activeTab}_2026.csv`);
+    link.setAttribute('download', `nutella_${activeTab}_2026.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -150,20 +284,9 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
               <Calendar className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                  Bảng Chấm Công NUTELLA (Quy Đổi Ngày Công)
-                </h2>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
-                  06/08 – 30/08/2026
-                </span>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">
-                  166.000 đ/công
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-                Hệ thống chuẩn hóa ngày công làm việc Nutella, áp dụng quy tắc 3 giai đoạn để tính công thực lãnh cho bộ phận Sản xuất (Label) và QA.
-              </p>
+              <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
+                Đối Soát & Chấm Công NUTELLA (06/08 – 30/08/2026)
+              </h2>
             </div>
           </div>
 
@@ -189,73 +312,10 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
                 <Wallet className="w-4 h-4" />
-                <span>Xem Bảng Lương (109,1M)</span>
+                <span>Xem Bảng Lương</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* 4 Summary Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {/* Card 1: Tổng công Nutella Bảng lương */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
-            <span>Công Nutella (Bảng Lương)</span>
-            <Wallet className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div className="text-2xl font-mono font-black text-emerald-700">
-            {NUTELLA_TIMESHEET_SUMMARY.consolidatedWorkdaysNutellaTotal.toLocaleString('vi-VN')}
-            <span className="text-xs font-normal text-slate-500 ml-1">công</span>
-          </div>
-          <div className="text-2xs font-semibold text-slate-500">
-            = {formatCurrencyVND(NUTELLA_TIMESHEET_SUMMARY.consolidatedSalaryNutellaTotal)}
-          </div>
-        </div>
-
-        {/* Card 2: Sản Xuất / Label */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
-            <span>Sản Xuất / Label (26 NS)</span>
-            <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
-          </div>
-          <div className="text-2xl font-mono font-black text-indigo-700">
-            {NUTELLA_TIMESHEET_SUMMARY.totalConvertedLabelWorkdays.toLocaleString('vi-VN')}
-            <span className="text-xs font-normal text-slate-500 ml-1">công</span>
-          </div>
-          <div className="text-2xs font-semibold text-slate-500">
-            GĐ1: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD1Total}c • GĐ2: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD2Total}c • GĐ3: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD3Total}c
-          </div>
-        </div>
-
-        {/* Card 3: Đội ngũ QA */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
-            <span>Đội Ngũ QA (5 NS)</span>
-            <ShieldCheck className="w-4 h-4 text-amber-600" />
-          </div>
-          <div className="text-2xl font-mono font-black text-amber-700">
-            {NUTELLA_TIMESHEET_SUMMARY.totalQAWorkdays}
-            <span className="text-xs font-normal text-slate-500 ml-1">công</span>
-          </div>
-          <div className="text-2xs font-semibold text-slate-500">
-            GĐ1: {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD1}c • GĐ2: {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD2}c • GĐ3: {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD3}c
-          </div>
-        </div>
-
-        {/* Card 4: Tổng nhân sự tham gia */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
-            <span>Nhân Sự Tham Gia</span>
-            <Users className="w-4 h-4 text-sky-600" />
-          </div>
-          <div className="text-2xl font-mono font-black text-sky-700">
-            28
-            <span className="text-xs font-normal text-slate-500 ml-1">nhân sự</span>
-          </div>
-          <div className="text-2xs font-semibold text-slate-500">
-            100% đã được đối soát & chốt công
           </div>
         </div>
       </div>
@@ -264,7 +324,29 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-2">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none w-full sm:w-auto">
+            {/* Tab 1: Báo Cáo EP & Giờ Tự Ghi */}
             <button
+              id="tab-nutella-ep-report"
+              type="button"
+              onClick={() => setActiveTab('ep_report')}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+                activeTab === 'ep_report'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Báo Cáo EP & Giờ Tự Ghi (26 NS)</span>
+              <span className={`text-2xs px-1.5 py-0.5 rounded-full font-mono font-bold ${
+                activeTab === 'ep_report' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'
+              }`}>
+                24,6M đ
+              </span>
+            </button>
+
+            {/* Tab 2: Bảng Công Quy Đổi */}
+            <button
+              id="tab-nutella-converted-workdays"
               type="button"
               onClick={() => setActiveTab('converted_workdays')}
               className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
@@ -273,14 +355,18 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <FileSpreadsheet className="w-4 h-4" />
+              <Layers className="w-4 h-4" />
               <span>Bảng Công Quy Đổi (28 NS)</span>
-              <span className="text-2xs px-1.5 py-0.2 rounded-full font-mono bg-white/20">
+              <span className={`text-2xs px-1.5 py-0.5 rounded-full font-mono font-bold ${
+                activeTab === 'converted_workdays' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+              }`}>
                 253c
               </span>
             </button>
 
+            {/* Tab 3: Đội Ngũ QA */}
             <button
+              id="tab-nutella-qa-breakdown"
               type="button"
               onClick={() => setActiveTab('qa_breakdown')}
               className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
@@ -291,12 +377,16 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Đội Ngũ QA (76 Công)</span>
-              <span className="text-2xs px-1.5 py-0.2 rounded-full font-mono bg-white/20">
+              <span className={`text-2xs px-1.5 py-0.5 rounded-full font-mono font-bold ${
+                activeTab === 'qa_breakdown' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+              }`}>
                 76c
               </span>
             </button>
 
+            {/* Tab 4: Quy Tắc */}
             <button
+              id="tab-nutella-rules"
               type="button"
               onClick={() => setActiveTab('rules')}
               className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
@@ -310,7 +400,7 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
             </button>
           </div>
 
-          {/* Search & Export */}
+          {/* Search & Export Actions */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
             {activeTab !== 'rules' && (
               <div className="relative flex-1 sm:w-56">
@@ -323,6 +413,27 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
                   className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
+            )}
+
+            {activeTab === 'ep_report' && (
+              <button
+                type="button"
+                onClick={handleCopyEpTSV}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer transition-colors shrink-0"
+                title="Sao chép toàn bộ bảng dạng TSV để dán trực tiếp vào Excel / Google Sheets"
+              >
+                {copiedEpTSV ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700 font-bold">Đã chép!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Chép Excel</span>
+                  </>
+                )}
+              </button>
             )}
 
             {activeTab !== 'rules' && (
@@ -338,6 +449,206 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
           </div>
         </div>
       </div>
+
+      {/* SUB-VIEW 0: BÁO CÁO EP & LƯƠNG GIỜ TỰ GHI (26 NHÂN SỰ) */}
+      {activeTab === 'ep_report' && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          {/* Header Description & Legend */}
+          <div className="p-4 bg-amber-50/60 border-b border-amber-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-slate-800 flex items-center gap-1.5">
+                <FileSpreadsheet className="w-4 h-4 text-amber-600" />
+                Bảng Báo Cáo Đối Soát EP & Lương Giờ Tự Ghi
+              </span>
+              <span className="text-slate-400">•</span>
+              <span className="text-slate-600">
+                Hiển thị <strong>{filteredAndSortedEpReport.length}</strong> / 26 nhân sự
+              </span>
+              <span className="text-slate-400">•</span>
+              <span className="text-amber-800 font-semibold bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300/60">
+                Đơn giá: 7.000 VNĐ / giờ
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3 text-2xs text-slate-600 font-mono flex-wrap">
+              <span>Tổng EP: <strong className="text-slate-900">{NUTELLA_EP_REPORT_TOTALS.totalEpCount.toLocaleString('vi-VN')}</strong></span>
+              <span>•</span>
+              <span>Tổng giờ: <strong className="text-indigo-700">{NUTELLA_EP_REPORT_TOTALS.totalDurationHoursDisplay.toLocaleString('vi-VN')}h</strong></span>
+              <span>•</span>
+              <span>Tổng lương: <strong className="text-emerald-700 font-bold">{formatCurrencyVND(NUTELLA_EP_REPORT_TOTALS.totalSalary)}</strong></span>
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold text-2xs uppercase tracking-wider select-none">
+                  <th
+                    onClick={() => handleEpSort('stt')}
+                    className="py-3 px-3 w-14 text-center cursor-pointer hover:bg-slate-200 transition-colors"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <span>STT</span>
+                      <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleEpSort('name')}
+                    className="py-3 px-4 min-w-[180px] cursor-pointer hover:bg-slate-200 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>Tên người</span>
+                      <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleEpSort('epCount')}
+                    className="py-3 px-3 text-right min-w-[130px] cursor-pointer hover:bg-slate-200 transition-colors"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>EP trong báo cáo</span>
+                      <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleEpSort('totalDurationSeconds')}
+                    className="py-3 px-3 text-right min-w-[160px] cursor-pointer hover:bg-slate-200 transition-colors"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Tổng thời lượng (giây)</span>
+                      <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleEpSort('totalDurationHours')}
+                    className="py-3 px-3 text-right min-w-[140px] cursor-pointer hover:bg-slate-200 transition-colors bg-indigo-50/80 text-indigo-900"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Tổng giờ tự ghi</span>
+                      <ArrowUpDown className="w-3 h-3 text-indigo-600" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleEpSort('epZeroDurationCount')}
+                    className="py-3 px-3 text-center min-w-[160px] cursor-pointer hover:bg-slate-200 transition-colors"
+                  >
+                    <div className="flex items-center justify-center gap-1">
+                      <span>EP không tính thời gian</span>
+                      <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </th>
+                  <th className="py-3 px-3 text-right min-w-[110px]">
+                    Đơn giá (h)
+                  </th>
+                  <th
+                    onClick={() => handleEpSort('salary')}
+                    className="py-3 px-4 text-right min-w-[140px] cursor-pointer hover:bg-slate-200 transition-colors bg-emerald-50/80 text-emerald-900 font-black"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>Lương (VNĐ)</span>
+                      <ArrowUpDown className="w-3 h-3 text-emerald-600" />
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-sans">
+                {filteredAndSortedEpReport.map((item, index) => {
+                  const hasZeroDuration = item.epZeroDurationCount > 0;
+                  return (
+                    <tr
+                      key={item.stt}
+                      className={`hover:bg-amber-50/40 transition-colors ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'
+                      }`}
+                    >
+                      <td className="py-2.5 px-3 text-center text-slate-400 font-mono text-2xs">
+                        {item.stt}
+                      </td>
+                      <td className="py-2.5 px-4 font-bold text-slate-900">
+                        {item.name}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono font-semibold text-slate-800">
+                        {item.epCount.toLocaleString('vi-VN')}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono text-slate-600 text-2xs">
+                        {item.totalDurationSeconds.toLocaleString('vi-VN', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono font-bold text-indigo-700 bg-indigo-50/30">
+                        {item.totalDurationHours.toLocaleString('vi-VN', {
+                          minimumFractionDigits: item.totalDurationHours % 1 === 0 ? 0 : 3,
+                          maximumFractionDigits: 3
+                        })}
+                        <span className="text-3xs font-normal text-slate-400 ml-1">h</span>
+                      </td>
+                      <td className="py-2.5 px-3 text-center">
+                        {hasZeroDuration ? (
+                          <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-2xs font-bold bg-rose-100 text-rose-700 border border-rose-200">
+                            {item.epZeroDurationCount} EP
+                          </span>
+                        ) : (
+                          <span className="text-slate-300 font-mono text-2xs">0</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono text-2xs text-slate-500">
+                        7.000 ₫
+                      </td>
+                      <td className="py-2.5 px-4 text-right font-mono font-black text-emerald-700 bg-emerald-50/30">
+                        {formatCurrencyVND(item.salary)}
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {filteredAndSortedEpReport.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-slate-400 text-xs">
+                      Không tìm thấy nhân sự phù hợp với từ khóa "{searchTerm}"
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+
+              {/* Summary Footer */}
+              <tfoot className="bg-slate-900 text-white font-bold border-t-2 border-slate-700">
+                <tr>
+                  <td colSpan={2} className="py-3 px-4 text-xs font-black uppercase tracking-wider text-slate-200">
+                    TỔNG CỘNG ({NUTELLA_EP_REPORT_TOTALS.personnelCount} NHÂN SỰ)
+                  </td>
+                  <td className="py-3 px-3 text-right font-mono text-xs text-amber-300">
+                    {NUTELLA_EP_REPORT_TOTALS.totalEpCount.toLocaleString('vi-VN')}
+                  </td>
+                  <td className="py-3 px-3 text-right font-mono text-2xs text-slate-300">
+                    {NUTELLA_EP_REPORT_TOTALS.totalDurationSeconds.toLocaleString('vi-VN', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </td>
+                  <td className="py-3 px-3 text-right font-mono text-xs text-sky-300 bg-slate-800">
+                    {NUTELLA_EP_REPORT_TOTALS.totalDurationHoursDisplay.toLocaleString('vi-VN', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                    <span className="text-3xs font-normal text-slate-400 ml-1">h</span>
+                  </td>
+                  <td className="py-3 px-3 text-center font-mono text-xs text-rose-300">
+                    {NUTELLA_EP_REPORT_TOTALS.totalEpZeroDurationCount} EP
+                  </td>
+                  <td className="py-3 px-3 text-right font-mono text-2xs text-slate-400">
+                    7.000 ₫/h
+                  </td>
+                  <td className="py-3 px-4 text-right font-mono text-sm font-black text-emerald-400 bg-slate-800">
+                    {formatCurrencyVND(NUTELLA_EP_REPORT_TOTALS.totalSalary)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* SUB-VIEW 1: BẢNG CÔNG QUY ĐỔI CHI TIẾT (28 NHÂN SỰ) */}
       {activeTab === 'converted_workdays' && (

@@ -198,7 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
                 >
                   <Wallet className="w-3.5 h-3.5" />
-                  <span>Bảng Lương (109,1M)</span>
+                  <span>Bảng Lương Tổng Hợp</span>
                 </button>
                 <button
                   id="btn-switch-to-ego-from-nutella"

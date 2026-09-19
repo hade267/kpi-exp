@@ -79,7 +79,7 @@ export const DetailedReconView: React.FC<DetailedReconViewProps> = ({
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
               >
                 <Wallet className="w-4 h-4" />
-                <span>Xem Bảng Lương (109,1M)</span>
+                <span>Xem Bảng Lương Tổng Hợp</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}

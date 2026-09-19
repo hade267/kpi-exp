@@ -234,22 +234,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>Đơn Giá Áp Dụng</span>
             </div>
 
-            <div className="space-y-1.5 text-slate-400 text-2xs">
+            <div className="space-y-1 text-slate-400 text-3xs">
               <div className="flex justify-between items-center py-0.5 border-b border-slate-700/50">
-                <span>KPI EGO:</span>
+                <span>KPI EGO / VIN:</span>
                 <span className="font-mono font-bold text-slate-200">50.000 đ/h</span>
               </div>
               <div className="flex justify-between items-center py-0.5 border-b border-slate-700/50">
-                <span>KPI VIN:</span>
-                <span className="font-mono font-bold text-slate-200">50.000 đ/h</span>
+                <span>KPI NUTELLA:</span>
+                <span className="font-mono font-bold text-amber-300">7.000 đ/h</span>
               </div>
               <div className="flex justify-between items-center py-0.5 border-b border-slate-700/50">
-                <span>Lương cứng NUTELLA:</span>
-                <span className="font-mono font-bold text-slate-200">166.000 đ/ngày</span>
+                <span>KPI QA NUTELLA:</span>
+                <span className="font-mono font-bold text-purple-300">2.000 đ/h</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-slate-700/50">
+                <span>Cứng NUTELLA:</span>
+                <span className="font-mono font-bold text-orange-300">166.000 đ/công</span>
               </div>
               <div className="flex justify-between items-center py-0.5">
-                <span>Lương cứng VIN:</span>
-                <span className="font-mono font-bold text-slate-200">153.000 đ/ngày</span>
+                <span>Cứng VIN:</span>
+                <span className="font-mono font-bold text-cyan-300">153.000 đ/công</span>
               </div>
             </div>
           </div>

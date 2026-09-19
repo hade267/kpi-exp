@@ -188,7 +188,7 @@ export default function App() {
               ) : currentSection === 'nutella_timesheet' ? (
                 <>
                   <Calendar className="w-4 h-4 text-amber-600" />
-                  <span>Bảng chấm công & giờ làm việc gốc NUTELLA (06/08 – 30/08/2026) • 291,5 công • 48.389.000 đ</span>
+                  <span>Dự án NUTELLA • Chấm công & Giờ làm việc</span>
                 </>
               ) : (
                 <>

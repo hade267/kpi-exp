@@ -822,3 +822,57 @@ export const NUTELLA_TIMESHEET_SUMMARY = {
   consolidatedWorkdaysNutellaTotal: 291.5,
   consolidatedSalaryNutellaTotal: 48389000
 };
+
+// ==========================================
+// BẢNG BÁO CÁO ĐỐI SOÁT EP & LƯƠNG TỰ GHI (26 NHÂN SỰ)
+// ==========================================
+export interface NutellaEpReportItem {
+  stt: number;
+  name: string;
+  epCount: number; // EP trong báo cáo
+  totalDurationSeconds: number; // Tổng thời lượng (giây)
+  totalDurationHours: number; // Tổng giờ tự ghi (h)
+  epZeroDurationCount: number; // EP không tính thời gian
+  salary: number; // Lương (VNĐ)
+}
+
+export const NUTELLA_EP_REPORT_DATA: NutellaEpReportItem[] = [
+  { stt: 1, name: 'Cao Xuân Tú', epCount: 862, totalDurationSeconds: 1083228.72, totalDurationHours: 300.897, epZeroDurationCount: 0, salary: 2106278 },
+  { stt: 2, name: 'DatNQ', epCount: 207, totalDurationSeconds: 308394.15, totalDurationHours: 85.665, epZeroDurationCount: 0, salary: 599655 },
+  { stt: 3, name: 'Diệp Minh Đại', epCount: 601, totalDurationSeconds: 717662.69, totalDurationHours: 199.351, epZeroDurationCount: 1, salary: 1395455 },
+  { stt: 4, name: 'Đỗ Văn Nguyên', epCount: 436, totalDurationSeconds: 450763.39, totalDurationHours: 125.212, epZeroDurationCount: 0, salary: 876484 },
+  { stt: 5, name: 'Giang', epCount: 611, totalDurationSeconds: 724994.31, totalDurationHours: 201.387, epZeroDurationCount: 0, salary: 1409711 },
+  { stt: 6, name: 'Hoàng Bảo Châu', epCount: 193, totalDurationSeconds: 169838.31, totalDurationHours: 47.177, epZeroDurationCount: 0, salary: 330241 },
+  { stt: 7, name: 'Kiều Duy Hưng', epCount: 397, totalDurationSeconds: 379222.08, totalDurationHours: 105.339, epZeroDurationCount: 0, salary: 737376 },
+  { stt: 8, name: 'Lê Quang Minh', epCount: 489, totalDurationSeconds: 572462.15, totalDurationHours: 159.017, epZeroDurationCount: 0, salary: 1113121 },
+  { stt: 9, name: 'Liễu Hải Nam', epCount: 314, totalDurationSeconds: 397448.31, totalDurationHours: 110.402, epZeroDurationCount: 0, salary: 772816 },
+  { stt: 10, name: 'Nam', epCount: 94, totalDurationSeconds: 69011.13, totalDurationHours: 19.17, epZeroDurationCount: 0, salary: 134188 },
+  { stt: 11, name: 'Nguyễn Thế Hân', epCount: 522, totalDurationSeconds: 633416.07, totalDurationHours: 175.949, epZeroDurationCount: 0, salary: 1231642 },
+  { stt: 12, name: 'Nguyễn Thế Quang', epCount: 864, totalDurationSeconds: 883089.27, totalDurationHours: 245.303, epZeroDurationCount: 0, salary: 1717118 },
+  { stt: 13, name: 'Nguyễn Tuấn Anh', epCount: 949, totalDurationSeconds: 1049243.35, totalDurationHours: 291.456, epZeroDurationCount: 1, salary: 2040195 },
+  { stt: 14, name: 'Nhật', epCount: 72, totalDurationSeconds: 56962.40, totalDurationHours: 15.823, epZeroDurationCount: 0, salary: 110760 },
+  { stt: 15, name: 'Phạm Anh Dũng', epCount: 635, totalDurationSeconds: 853858.28, totalDurationHours: 237.183, epZeroDurationCount: 0, salary: 1660280 },
+  { stt: 16, name: 'Phạm Đạt', epCount: 601, totalDurationSeconds: 585393.73, totalDurationHours: 162.609, epZeroDurationCount: 10, salary: 1138266 },
+  { stt: 17, name: 'Phạm Thùy', epCount: 29, totalDurationSeconds: 22517.13, totalDurationHours: 6.255, epZeroDurationCount: 0, salary: 43783 },
+  { stt: 18, name: 'Phạm Xuân Việt', epCount: 948, totalDurationSeconds: 946474.63, totalDurationHours: 262.91, epZeroDurationCount: 0, salary: 1840367 },
+  { stt: 19, name: 'Quách Minh Chiến', epCount: 714, totalDurationSeconds: 786082.12, totalDurationHours: 218.356, epZeroDurationCount: 2, salary: 1528493 },
+  { stt: 20, name: 'Quang Anh', epCount: 34, totalDurationSeconds: 34747.58, totalDurationHours: 9.652, epZeroDurationCount: 0, salary: 67565 },
+  { stt: 21, name: 'Quân', epCount: 10, totalDurationSeconds: 6827.69, totalDurationHours: 1.897, epZeroDurationCount: 0, salary: 13276 },
+  { stt: 22, name: 'Thi', epCount: 17, totalDurationSeconds: 12722.59, totalDurationHours: 3.534, epZeroDurationCount: 0, salary: 24738 },
+  { stt: 23, name: 'Thùy', epCount: 97, totalDurationSeconds: 81744.81, totalDurationHours: 22.707, epZeroDurationCount: 0, salary: 158948 },
+  { stt: 24, name: 'Tuấn Vũ', epCount: 935, totalDurationSeconds: 1051816.68, totalDurationHours: 292.171, epZeroDurationCount: 0, salary: 2045199 },
+  { stt: 25, name: 'Vũ Ngọc Dân', epCount: 603, totalDurationSeconds: 710263.51, totalDurationHours: 197.295, epZeroDurationCount: 0, salary: 1381068 },
+  { stt: 26, name: 'Yên', epCount: 82, totalDurationSeconds: 63361.01, totalDurationHours: 17.6, epZeroDurationCount: 0, salary: 123202 }
+];
+
+export const NUTELLA_EP_REPORT_TOTALS = {
+  personnelCount: 26,
+  totalEpCount: 11319,
+  totalDurationSeconds: 12651546.07,
+  totalDurationHoursExact: 3514.318354,
+  totalDurationHoursDisplay: 3514.32,
+  totalEpZeroDurationCount: 14,
+  totalSalary: 24600228,
+  hourlyRate: 7000
+};
+
