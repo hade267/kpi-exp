@@ -1,17 +1,12 @@
 import React from 'react';
 import {
-  ShieldCheck,
   Wallet,
   X,
   Calculator,
-  Layers,
-  Calendar,
-  FolderOpen,
-  ExternalLink
+  Layers
 } from 'lucide-react';
 import { CONSOLIDATED_SALARY_TOTALS } from '../data/salaryConsolidatedData';
 import { formatCurrencyVND } from '../utils/formatters';
-import { DRIVE_LINKS } from '../data/driveLinks';
 
 export type MainSection = 'ego_inspection' | 'consolidated_salary' | 'nutella_timesheet';
 
@@ -83,41 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <nav className="space-y-1">
-              {/* Item 1: Đối Soát Nghiệm Thu EGO */}
-              <button
-                id="sidebar-btn-ego-inspection"
-                onClick={() => {
-                  onSelectSection('ego_inspection');
-                  onCloseMobile();
-                }}
-                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer ${
-                  currentSection === 'ego_inspection'
-                    ? 'bg-indigo-600 text-white font-semibold shadow-xs'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <ShieldCheck
-                    className={`w-4 h-4 shrink-0 ${
-                      currentSection === 'ego_inspection'
-                        ? 'text-white'
-                        : 'text-slate-400 group-hover:text-indigo-400'
-                    }`}
-                  />
-                  <span className="text-xs sm:text-sm truncate">Đối Soát Nghiệm Thu EGO</span>
-                </div>
-                <span
-                  className={`text-3xs px-2 py-0.5 rounded-full font-mono shrink-0 ml-2 ${
-                    currentSection === 'ego_inspection'
-                      ? 'bg-white/20 text-white'
-                      : 'bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  27 NS
-                </span>
-              </button>
-
-              {/* Item 2: Bảng Lương Tổng Hợp (Dữ liệu CSV) */}
+              {/* Item: Bảng Lương Tổng Hợp (Dữ liệu CSV) */}
               <button
                 id="sidebar-btn-consolidated-salary"
                 onClick={() => {
@@ -150,81 +111,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   36 NS
                 </span>
               </button>
-
-              {/* Item 3: Chấm Công Dự Án NUTELLA (EP / QA) */}
-              <button
-                id="sidebar-btn-nutella-timesheet"
-                onClick={() => {
-                  onSelectSection('nutella_timesheet');
-                  onCloseMobile();
-                }}
-                className={`w-full text-left px-3 py-2.5 rounded-xl transition-all flex items-center justify-between group cursor-pointer ${
-                  currentSection === 'nutella_timesheet'
-                    ? 'bg-amber-600 text-white font-semibold shadow-xs'
-                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white font-medium'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Calendar
-                    className={`w-4 h-4 shrink-0 ${
-                      currentSection === 'nutella_timesheet'
-                        ? 'text-white'
-                        : 'text-slate-400 group-hover:text-amber-400'
-                    }`}
-                  />
-                  <span className="text-xs sm:text-sm truncate">Chấm Công NUTELLA</span>
-                </div>
-                <span
-                  className={`text-3xs px-2 py-0.5 rounded-full font-mono shrink-0 ml-2 ${
-                    currentSection === 'nutella_timesheet'
-                      ? 'bg-white/20 text-white'
-                      : 'bg-slate-800 text-amber-400 font-bold'
-                  }`}
-                >
-                  291.5 c
-                </span>
-              </button>
             </nav>
-          </div>
-
-          {/* Google Drive Recon Folders */}
-          <div className="space-y-1.5 pt-2 border-t border-slate-800">
-            <div className="px-2 text-3xs font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-              <span>Hồ Sơ Đối Soát (Drive)</span>
-              <FolderOpen className="w-3 h-3 text-slate-500" />
-            </div>
-
-            <div className="space-y-1">
-              <a
-                id="sidebar-link-drive-ego"
-                href={DRIVE_LINKS.egoInspection}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-left px-3 py-2 rounded-xl transition-all flex items-center justify-between text-slate-300 hover:bg-slate-800/90 hover:text-indigo-300 group cursor-pointer text-xs"
-                title="Mở thư mục Google Drive Đối Soát EGO"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <FolderOpen className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                  <span className="truncate">Drive Đối Soát EGO</span>
-                </div>
-                <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-indigo-400 shrink-0 ml-1" />
-              </a>
-
-              <a
-                id="sidebar-link-drive-nutella"
-                href={DRIVE_LINKS.nutellaInspection}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-left px-3 py-2 rounded-xl transition-all flex items-center justify-between text-slate-300 hover:bg-slate-800/90 hover:text-amber-300 group cursor-pointer text-xs"
-                title="Mở thư mục Google Drive Đối Soát Nutella"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <FolderOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span className="truncate">Drive Đối Soát Nutella</span>
-                </div>
-                <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-amber-400 shrink-0 ml-1" />
-              </a>
-            </div>
           </div>
 
           {/* Quick Unit Rates Reference */}

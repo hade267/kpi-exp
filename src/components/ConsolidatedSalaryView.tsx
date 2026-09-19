@@ -20,12 +20,9 @@ import {
   Calendar,
   Building2,
   Users,
-  FolderOpen,
-  ExternalLink,
   ShieldAlert,
   Sparkles
 } from 'lucide-react';
-import { DRIVE_LINKS } from '../data/driveLinks';
 
 type SortColumn =
   | 'stt'

@@ -210,50 +210,10 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Drive links for Consolidated Salary */}
-                <a
-                  id="btn-header-salary-drive-ego"
-                  href={DRIVE_LINKS.egoInspection}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-2xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors cursor-pointer"
-                  title="Mở thư mục Google Drive Đối Soát EGO"
-                >
-                  <FolderOpen className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Drive EGO</span>
-                  <ExternalLink className="w-3 h-3 text-indigo-400" />
-                </a>
-
-                <a
-                  id="btn-header-salary-drive-nutella"
-                  href={DRIVE_LINKS.nutellaInspection}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-2xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer"
-                  title="Mở thư mục Google Drive Đối Soát Nutella"
-                >
-                  <FolderOpen className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Drive Nutella</span>
-                  <ExternalLink className="w-3 h-3 text-amber-600" />
-                </a>
-
-                <button
-                  id="btn-switch-to-nutella-from-salary"
-                  onClick={() => onSelectSection('nutella_timesheet')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition-colors cursor-pointer"
-                >
-                  <Calendar className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Chấm Công Nutella (291,5c)</span>
-                </button>
-                <button
-                  id="btn-switch-to-ego"
-                  onClick={() => onSelectSection('ego_inspection')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors border border-slate-200 cursor-pointer"
-                >
-                  <span>Đối Soát EGO</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-                </button>
+              <div className="flex items-center gap-2">
+                <span className="text-2xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  Dữ Liệu Chuẩn 3 Dự Án
+                </span>
               </div>
             )}
           </div>
