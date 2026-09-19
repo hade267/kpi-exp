@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { PersonnelRecon } from '../types';
 import { formatNumber, formatHours, formatPercent, formatSecondsToDetailed, formatCurrencyVND } from '../utils/formatters';
-import { generatePersonnelItems } from '../data/detailedReconData';
 import { UPLOAD_ISSUE_MAP } from '../data/uploadIssueData';
 import {
   Award,
@@ -14,18 +13,16 @@ import {
   ShieldCheck,
   XCircle,
   Info,
-  ListFilter,
-  Search,
-  ArrowUpRight,
-  X,
-  ChevronDown,
-  ChevronUp,
+  ArrowRight,
   CheckCircle2,
   Coins,
   Calculator,
-  Wallet
+  Wallet,
+  FolderOpen,
+  ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { DRIVE_LINKS } from '../data/driveLinks';
 
 interface PersonalSlipCardProps {
   person: PersonnelRecon;
@@ -33,12 +30,8 @@ interface PersonalSlipCardProps {
   onViewDetailedTab?: (personnelId: number) => void;
 }
 
-export const PersonalSlipCard: React.FC<PersonalSlipCardProps> = ({ person, onViewDetailedTab }) => {
+export const PersonalSlipCard: React.FC<PersonalSlipCardProps> = ({ person }) => {
   const [copied, setCopied] = useState(false);
-  const [showDetailedList, setShowDetailedList] = useState<boolean>(true);
-  const [itemStatusFilter, setItemStatusFilter] = useState<'all' | 'Pass' | 'Fail'>('all');
-  const [itemSearchQuery, setItemSearchQuery] = useState<string>('');
-  const [copiedItemCode, setCopiedItemCode] = useState<string | null>(null);
 
   // Salary Calculator State for this person
   const [hourlyRate, setHourlyRate] = useState<number>(50000); // 50,000 VND / hour default
@@ -51,25 +44,6 @@ export const PersonalSlipCard: React.FC<PersonalSlipCardProps> = ({ person, onVi
   // Salary calculations
   const baseSalary = Math.round(person.passDurationHours * hourlyRate);
   const totalSalary = baseSalary + (allowance || 0);
-
-  // Load detailed items for this person
-  const personalItems = useMemo(() => generatePersonnelItems(person.id), [person.id]);
-
-  // Filter personal items
-  const filteredPersonalItems = useMemo(() => {
-    return personalItems.filter((item) => {
-      if (itemStatusFilter !== 'all' && item.status !== itemStatusFilter) return false;
-      if (itemSearchQuery.trim()) {
-        const q = itemSearchQuery.toLowerCase().trim();
-        return (
-          item.videoCode.toLowerCase().includes(q) ||
-          item.category.toLowerCase().includes(q) ||
-          (item.errorReason && item.errorReason.toLowerCase().includes(q))
-        );
-      }
-      return true;
-    });
-  }, [personalItems, itemStatusFilter, itemSearchQuery]);
 
   const handleCopy = () => {
     const text = `📋 [ĐỐI SOÁT NGHIỆM THU EGO - GIAI ĐOẠN II]
@@ -429,203 +403,37 @@ ${allowance > 0 ? `- Phụ cấp/thưởng thêm: ${formatCurrencyVND(allowance)
           </div>
         </div>
 
-        {/* Detailed Video Tasks Section */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
-          <div
-            className="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition-colors"
-            onClick={() => setShowDetailedList(!showDetailedList)}
-          >
-            <div className="flex items-center gap-2">
-              <ListFilter className="w-4 h-4 text-indigo-600" />
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Chi Tiết Đối Soát Từng Bài {personalItems.length > 0 ? `(${personalItems.length} video)` : '(Đang cập nhật lại)'}
-              </h4>
+        {/* Chi Tiết Đối Soát Từng Bài - Đổi sang link Google Drive EGO */}
+        <a
+          id={`btn-drive-detailed-link-${person.id}`}
+          href={DRIVE_LINKS.egoInspection}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group block bg-gradient-to-r from-indigo-50/90 via-white to-indigo-50/60 hover:from-indigo-100/90 hover:to-indigo-100/60 rounded-xl border border-indigo-200 hover:border-indigo-400 p-3.5 transition-all shadow-2xs hover:shadow-xs cursor-pointer"
+          title="Mở thư mục Google Drive chứa hồ sơ đối soát từng bài EGO"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-200 group-hover:scale-105 transition-transform">
+                <FolderOpen className="w-4.5 h-4.5 text-indigo-600" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-indigo-600 flex items-center gap-1.5 truncate">
+                  <span>Chi Tiết Đối Soát Từng Bài (Google Drive)</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                </div>
+                <p className="text-2xs text-slate-500 truncate">
+                  Truy cập thư mục Google Drive để xem file đối soát chi tiết từng video của dự án EGO
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              {personalItems.length > 0 ? (
-                <span className="text-2xs font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  {person.passCount} Pass • {person.failCount} Fail
-                </span>
-              ) : (
-                <span className="text-2xs font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">
-                  Đang cập nhật lại
-                </span>
-              )}
-              {showDetailedList ? (
-                <ChevronUp className="w-4 h-4 text-slate-500" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-slate-500" />
-              )}
+            <div className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-2xs group-hover:bg-indigo-700 transition-colors shrink-0">
+              <span className="hidden sm:inline">Mở Drive EGO</span>
+              <span className="sm:hidden">Drive</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </div>
-
-          {showDetailedList && (
-            <div className="p-3.5 space-y-3">
-              {/* Filter controls */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5">
-                <div className="flex items-center gap-1.5 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => setItemStatusFilter('all')}
-                    className={`px-2.5 py-1 rounded-lg text-2xs font-semibold transition-all ${
-                      itemStatusFilter === 'all'
-                        ? 'bg-slate-800 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    Tất cả ({personalItems.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setItemStatusFilter('Pass')}
-                    className={`px-2.5 py-1 rounded-lg text-2xs font-semibold transition-all flex items-center gap-1 ${
-                      itemStatusFilter === 'Pass'
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                    }`}
-                  >
-                    <CheckCircle2 className="w-3 h-3" />
-                    Pass ({person.passCount})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setItemStatusFilter('Fail')}
-                    className={`px-2.5 py-1 rounded-lg text-2xs font-semibold transition-all flex items-center gap-1 ${
-                      itemStatusFilter === 'Fail'
-                        ? 'bg-rose-600 text-white shadow-2xs'
-                        : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
-                    }`}
-                  >
-                    <XCircle className="w-3 h-3" />
-                    Fail ({person.failCount})
-                  </button>
-                </div>
-
-                <div className="relative w-full sm:w-60">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    value={itemSearchQuery}
-                    onChange={(e) => setItemSearchQuery(e.target.value)}
-                    placeholder="Tìm mã video, lỗi..."
-                    className="w-full pl-8 pr-7 py-1 text-2xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                  />
-                  {itemSearchQuery && (
-                    <button
-                      onClick={() => setItemSearchQuery('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Scrollable list */}
-              <div className="max-h-64 overflow-y-auto border border-slate-200 rounded-xl divide-y divide-slate-100">
-                {personalItems.length === 0 ? (
-                  <div className="py-6 px-4 text-center space-y-1.5 bg-amber-50/40">
-                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-700 mx-auto">
-                      <Clock className="w-4 h-4 animate-pulse" />
-                    </div>
-                    <div className="text-xs font-bold text-slate-800">
-                      Dữ liệu đối soát chi tiết từng bài đang được cập nhật lại
-                    </div>
-                    <p className="text-2xs text-slate-500 max-w-md mx-auto">
-                      Toàn bộ dữ liệu chi tiết video cũ đã được xóa bỏ để chuẩn bị tích hợp lại tệp đối soát mới.
-                      Số giờ Pass tính công ({formatHours(person.passDurationHours)}) và lương ước tính ({formatCurrencyVND(totalSalary)}) vẫn hiển thị đầy đủ ở phần trên.
-                    </p>
-                  </div>
-                ) : filteredPersonalItems.length === 0 ? (
-                  <div className="py-6 text-center text-slate-400 text-xs">
-                    Không có bài đối soát nào khớp với bộ lọc.
-                  </div>
-                ) : (
-                  filteredPersonalItems.map((item, idx) => {
-                    const isPass = item.status === 'Pass';
-                    return (
-                      <div
-                        key={item.id}
-                        className="p-2.5 px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors text-xs"
-                      >
-                        <div className="flex items-start gap-2 min-w-0">
-                          <span className="w-5 font-mono text-2xs text-slate-400 text-right flex-shrink-0 pt-0.5">
-                            {idx + 1}
-                          </span>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="font-mono font-semibold text-slate-800 text-2xs truncate max-w-[260px] sm:max-w-[340px]">
-                                {item.videoCode}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(item.videoCode);
-                                  setCopiedItemCode(item.videoCode);
-                                  setTimeout(() => setCopiedItemCode(null), 1500);
-                                }}
-                                className="text-slate-400 hover:text-indigo-600 transition-colors"
-                                title="Sao chép mã video"
-                              >
-                                {copiedItemCode === item.videoCode ? (
-                                  <CheckCheck className="w-3 h-3 text-emerald-600" />
-                                ) : (
-                                  <Copy className="w-3 h-3" />
-                                )}
-                              </button>
-                            </div>
-
-                            <div className="text-2xs text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
-                              <span>Ngày: <strong>{item.date}</strong></span>
-                              <span>•</span>
-                              <span>{item.category}</span>
-                              {!isPass && item.errorReason && (
-                                <>
-                                  <span>•</span>
-                                  <span className="text-rose-600 font-medium">
-                                    {item.errorReason}
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 self-end sm:self-auto flex-shrink-0">
-                          <span className="font-mono text-xs font-bold text-slate-700">
-                            {item.durationFormatted}
-                          </span>
-                          {isPass ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Pass
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                              <XCircle className="w-3 h-3 text-rose-600" /> Fail
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {onViewDetailedTab && (
-                <div className="pt-1 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => onViewDetailedTab(person.id)}
-                    className="inline-flex items-center gap-1 text-2xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline"
-                  >
-                    <span>Mở toàn bộ trong tab Đối Soát Chi Tiết</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        </a>
 
         {/* Action Button: Only Copy summary */}
         <div className="flex items-center justify-between gap-3 pt-1 no-print">

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import {
   Calendar,
-  Clock,
   Search,
   Download,
   Filter,
@@ -16,7 +15,6 @@ import {
   Layers,
   ArrowRight,
   Calculator,
-  Eye,
   FileSpreadsheet,
   FolderOpen,
   ExternalLink
@@ -25,11 +23,9 @@ import { DRIVE_LINKS } from '../data/driveLinks';
 import {
   NUTELLA_DATES,
   NUTELLA_RULES,
-  LABEL_RAW_HOURS_DATA,
   LABEL_CONVERTED_WORKDAYS_DATA,
   QA_TIMESHEET_DATA,
-  NUTELLA_TIMESHEET_SUMMARY,
-  NutellaDateKey
+  NUTELLA_TIMESHEET_SUMMARY
 } from '../data/nutellaTimesheetData';
 import { formatCurrencyVND } from '../utils/formatters';
 
@@ -37,13 +33,12 @@ interface NutellaTimesheetViewProps {
   onSwitchSection?: (section: 'ego_inspection' | 'consolidated_salary' | 'nutella_timesheet') => void;
 }
 
-type NutellaSubTab = 'converted_workdays' | 'raw_hours' | 'qa_breakdown' | 'rules';
+type NutellaSubTab = 'converted_workdays' | 'qa_breakdown' | 'rules';
 
 export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSwitchSection }) => {
   const [activeTab, setActiveTab] = useState<NutellaSubTab>('converted_workdays');
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<'ALL' | 'Label' | 'QA'>('ALL');
-  const [qaDisplayMode, setQaDisplayMode] = useState<'workdays' | 'hours'>('workdays');
 
   // Interactive formula tester
   const [testHours, setTestHours] = useState<number>(12);
@@ -81,13 +76,6 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
     });
   }, [searchTerm, departmentFilter]);
 
-  // Filtered Raw Hours Data
-  const filteredRawHours = useMemo(() => {
-    return LABEL_RAW_HOURS_DATA.filter(item => {
-      return item.name.toLowerCase().includes(searchTerm.toLowerCase().trim());
-    });
-  }, [searchTerm]);
-
   // Filtered QA Data
   const filteredQA = useMemo(() => {
     return QA_TIMESHEET_DATA.filter(item => {
@@ -116,27 +104,18 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
         item.totalWorkdays
       ]);
       csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    } else if (activeTab === 'raw_hours') {
-      const headers = ['STT', 'Bo_phan', 'Ho_va_ten', ...NUTELLA_DATES, 'So_ngay_co_gio', 'Tong_gio_h'];
-      const rows = LABEL_RAW_HOURS_DATA.map(item => [
-        item.stt,
-        `"${item.department}"`,
-        `"${item.name}"`,
-        ...NUTELLA_DATES.map(d => item.dailyHours[d] ?? ''),
-        item.activeDaysCount,
-        item.totalHours
-      ]);
-      csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     } else {
-      const headers = ['STT', 'Bo_phan', 'Ho_va_ten', 'Username', 'Profile', ...NUTELLA_DATES, 'Tong_gio', 'Tong_cong'];
+      const headers = ['STT', 'Bo_phan', 'Ho_va_ten', 'Username', 'Profile', ...NUTELLA_DATES, 'Cong_GD1', 'Cong_GD2', 'Cong_GD3', 'Tong_cong'];
       const rows = QA_TIMESHEET_DATA.map(item => [
         item.stt,
         `"${item.department}"`,
         `"${item.name}"`,
         `"${item.username}"`,
         `"${item.profileName}"`,
-        ...NUTELLA_DATES.map(d => (qaDisplayMode === 'workdays' ? item.dailyWorkdays[d] : item.dailyHours[d]) ?? ''),
-        item.totalHours,
+        ...NUTELLA_DATES.map(d => item.dailyWorkdays[d] ?? ''),
+        item.workdaysGD1,
+        item.workdaysGD2,
+        item.workdaysGD3,
         item.totalWorkdays
       ]);
       csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -173,17 +152,17 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
             <div>
               <div className="flex items-center gap-2 flex-wrap mb-1">
                 <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                  Bảng Chấm Công & Giờ Làm Việc NUTELLA
+                  Bảng Chấm Công NUTELLA (Quy Đổi Ngày Công)
                 </h2>
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
                   06/08 – 30/08/2026
                 </span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">
                   166.000 đ/công
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
-                Hệ thống chuẩn hóa số giờ làm việc từ hệ thống EP, áp dụng quy tắc 3 giai đoạn (GĐ1: 5h, GĐ2: 10h, GĐ3A: 20h, GĐ3B: 25h) để tính công thực lãnh cho bộ phận Sản xuất (Label) và QA.
+                Hệ thống chuẩn hóa ngày công làm việc Nutella, áp dụng quy tắc 3 giai đoạn để tính công thực lãnh cho bộ phận Sản xuất (Label) và QA.
               </p>
             </div>
           </div>
@@ -235,24 +214,10 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
           </div>
         </div>
 
-        {/* Card 2: Giờ gốc EP Label */}
+        {/* Card 2: Sản Xuất / Label */}
         <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
-            <span>Giờ Gốc EP Label (26 NS)</span>
-            <Clock className="w-4 h-4 text-sky-600" />
-          </div>
-          <div className="text-2xl font-mono font-black text-sky-700">
-            {NUTELLA_TIMESHEET_SUMMARY.totalLabelRawHours.toLocaleString('vi-VN')}h
-          </div>
-          <div className="text-2xs font-semibold text-slate-500">
-            265 lượt ngày công phát sinh giờ
-          </div>
-        </div>
-
-        {/* Card 3: Công quy đổi Label/EP */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
-          <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
-            <span>Công Quy Đổi Label (26 NS)</span>
+            <span>Sản Xuất / Label (26 NS)</span>
             <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-2xl font-mono font-black text-indigo-700">
@@ -260,11 +225,11 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
             <span className="text-xs font-normal text-slate-500 ml-1">công</span>
           </div>
           <div className="text-2xs font-semibold text-slate-500">
-            GĐ1: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD1Total} • GĐ2: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD2Total} • GĐ3: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD3Total}
+            GĐ1: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD1Total}c • GĐ2: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD2Total}c • GĐ3: {NUTELLA_TIMESHEET_SUMMARY.workdaysGD3Total}c
           </div>
         </div>
 
-        {/* Card 4: Đội ngũ QA Handled */}
+        {/* Card 3: Đội ngũ QA */}
         <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
           <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
             <span>Đội Ngũ QA (5 NS)</span>
@@ -275,7 +240,22 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
             <span className="text-xs font-normal text-slate-500 ml-1">công</span>
           </div>
           <div className="text-2xs font-semibold text-slate-500">
-            {NUTELLA_TIMESHEET_SUMMARY.totalQARawHours.toLocaleString('vi-VN')}h handled thực tế
+            GĐ1: {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD1}c • GĐ2: {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD2}c • GĐ3: {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD3}c
+          </div>
+        </div>
+
+        {/* Card 4: Tổng nhân sự tham gia */}
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-1">
+          <div className="flex items-center justify-between text-2xs font-bold uppercase tracking-wider text-slate-500">
+            <span>Nhân Sự Tham Gia</span>
+            <Users className="w-4 h-4 text-sky-600" />
+          </div>
+          <div className="text-2xl font-mono font-black text-sky-700">
+            28
+            <span className="text-xs font-normal text-slate-500 ml-1">nhân sự</span>
+          </div>
+          <div className="text-2xs font-semibold text-slate-500">
+            100% đã được đối soát & chốt công
           </div>
         </div>
       </div>
@@ -302,22 +282,6 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
 
             <button
               type="button"
-              onClick={() => setActiveTab('raw_hours')}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'raw_hours'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Clock className="w-4 h-4" />
-              <span>Giờ Gốc EP Sản Xuất (26 NS)</span>
-              <span className="text-2xs px-1.5 py-0.2 rounded-full font-mono bg-white/20">
-                4.439h
-              </span>
-            </button>
-
-            <button
-              type="button"
               onClick={() => setActiveTab('qa_breakdown')}
               className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'qa_breakdown'
@@ -326,7 +290,7 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
               }`}
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Đội Ngũ QA (Handled & Công)</span>
+              <span>Đội Ngũ QA (76 Công)</span>
               <span className="text-2xs px-1.5 py-0.2 rounded-full font-mono bg-white/20">
                 76c
               </span>
@@ -555,153 +519,20 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
         </div>
       )}
 
-      {/* SUB-VIEW 2: BẢNG SỐ GIỜ LÀM VIỆC GỐC (LABEL / EP) */}
-      {activeTab === 'raw_hours' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div>
-              <h3 className="font-bold text-slate-800">
-                Bảng Số Giờ Làm Việc Gốc Bộ Phận Sản Xuất (26 nhân sự Label)
-              </h3>
-              <p className="text-2xs text-slate-500">
-                Thời gian: 06/08 – 30/08/2026 • Đơn vị: Giờ làm việc quy đổi từ log hệ thống EP
-              </p>
-            </div>
-            <div className="text-2xs font-bold text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
-              Tổng giờ: <span className="font-mono text-sky-700 font-black">{NUTELLA_TIMESHEET_SUMMARY.totalLabelRawHours.toLocaleString('vi-VN')}h</span> (265 lượt ngày)
-            </div>
-          </div>
-
-          <div className="overflow-x-auto max-h-[620px] scrollbar-thin">
-            <table className="w-full text-xs text-left border-collapse">
-              <thead className="sticky top-0 bg-slate-100/95 backdrop-blur-xs z-20 text-slate-700 font-bold border-b border-slate-200 shadow-2xs">
-                <tr>
-                  <th className="p-2.5 text-center w-10 border-r border-slate-200">STT</th>
-                  <th className="p-2.5 min-w-[160px] border-r border-slate-200">Họ và tên</th>
-                  <th className="p-2.5 min-w-[130px] border-r border-slate-200">Bộ phận</th>
-                  {NUTELLA_DATES.map(date => (
-                    <th
-                      key={date}
-                      className="p-1.5 text-center min-w-[48px] border-r border-slate-200 font-mono text-2xs bg-slate-50"
-                      title={`Ngày ${date}`}
-                    >
-                      {date.split('/')[0]}
-                    </th>
-                  ))}
-                  <th className="p-2 text-center min-w-[90px] bg-slate-100 text-slate-800 border-r border-slate-200">
-                    Số ngày có giờ
-                  </th>
-                  <th className="p-2 text-center min-w-[100px] bg-sky-100 text-sky-950 font-black">
-                    Tổng giờ (h)
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredRawHours.map(item => (
-                  <tr key={item.stt} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-2 text-center font-mono text-slate-400 border-r border-slate-100">
-                      {item.stt}
-                    </td>
-                    <td className="p-2.5 font-bold text-slate-900 border-r border-slate-100 whitespace-nowrap">
-                      {item.name}
-                    </td>
-                    <td className="p-2 text-slate-500 border-r border-slate-100 text-2xs whitespace-nowrap">
-                      {item.department}
-                    </td>
-                    {NUTELLA_DATES.map(date => {
-                      const val = item.dailyHours[date];
-                      return (
-                        <td
-                          key={date}
-                          className={`p-1.5 text-center font-mono text-2xs border-r border-slate-100 ${
-                            val ? 'text-slate-800 font-semibold' : 'text-slate-200'
-                          }`}
-                        >
-                          {val ? (
-                            <span className="inline-block px-1 rounded bg-sky-50 text-sky-800">
-                              {val.toFixed(1)}
-                            </span>
-                          ) : (
-                            '•'
-                          )}
-                        </td>
-                      );
-                    })}
-                    <td className="p-2 text-center font-mono font-bold text-slate-700 bg-slate-50/50 border-r border-slate-100">
-                      {item.activeDaysCount} ngày
-                    </td>
-                    <td className="p-2 text-center font-mono font-black text-sky-700 bg-sky-50/40">
-                      {item.totalHours.toFixed(2)}h
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot className="sticky bottom-0 bg-slate-900 text-white font-bold border-t-2 border-slate-700 z-10">
-                <tr>
-                  <td colSpan={3} className="p-3 text-center uppercase tracking-wider text-xs">
-                    TỔNG CỘNG GIỜ LABEL (EP)
-                  </td>
-                  {NUTELLA_DATES.map(date => {
-                    const dayTotalHours = LABEL_RAW_HOURS_DATA.reduce(
-                      (acc, cur) => acc + (cur.dailyHours[date] || 0),
-                      0
-                    );
-                    return (
-                      <td key={date} className="p-1 text-center font-mono text-2xs text-sky-300">
-                        {dayTotalHours > 0 ? dayTotalHours.toFixed(0) : '0'}
-                      </td>
-                    );
-                  })}
-                  <td className="p-2.5 text-center font-mono text-amber-300 bg-slate-800">
-                    265 ngày
-                  </td>
-                  <td className="p-2.5 text-center font-mono text-base font-black text-white bg-sky-600">
-                    {NUTELLA_TIMESHEET_SUMMARY.totalLabelRawHours.toFixed(2)}h
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* SUB-VIEW 3: ĐỘI NGŨ QA (HANDLED & CÔNG QUY ĐỔI) */}
+      {/* SUB-VIEW 2: ĐỘI NGŨ QA (CÔNG QUY ĐỔI) */}
       {activeTab === 'qa_breakdown' && (
         <div className="space-y-4">
-          {/* Toggle Display Mode between Handled Hours & Workdays */}
           <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-bold text-slate-900">
-                Bảng Công Quy Đổi & Số Giờ Handled Đội Ngũ QA Tháng 08/2026
+                Bảng Chấm Công Quy Đổi Đội Ngũ QA Tháng 08/2026
               </h3>
               <p className="text-xs text-slate-500">
-                5 nhân sự QA • Tổng 7.891,58h handled • Quy đổi ra 76,0 ngày công (GĐ1: 26c, GĐ2: 17.5c, GĐ3: 32.5c)
+                5 nhân sự QA • Tổng 76,0 ngày công (GĐ1: 18c, GĐ2: 10c, GĐ3: 48c)
               </p>
             </div>
-
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => setQaDisplayMode('workdays')}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  qaDisplayMode === 'workdays'
-                    ? 'bg-white text-indigo-700 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Phần II: Công Quy Đổi (76 công)
-              </button>
-              <button
-                type="button"
-                onClick={() => setQaDisplayMode('hours')}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  qaDisplayMode === 'hours'
-                    ? 'bg-white text-amber-700 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Phần I: Giờ Handled Thực Tế (7.891h)
-              </button>
+            <div className="text-2xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 font-mono">
+              Tổng cộng QA: 76 ngày công
             </div>
           </div>
 
@@ -723,31 +554,18 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
                         {date.split('/')[0]}
                       </th>
                     ))}
-                    {qaDisplayMode === 'workdays' ? (
-                      <>
-                        <th className="p-2 text-center min-w-[65px] bg-sky-100 text-sky-900 border-r border-slate-200">
-                          Công GĐ1
-                        </th>
-                        <th className="p-2 text-center min-w-[65px] bg-amber-100 text-amber-900 border-r border-slate-200">
-                          Công GĐ2
-                        </th>
-                        <th className="p-2 text-center min-w-[65px] bg-emerald-100 text-emerald-900 border-r border-slate-200">
-                          Công GĐ3
-                        </th>
-                        <th className="p-2 text-center min-w-[80px] bg-indigo-100 text-indigo-950 font-black">
-                          TỔNG CÔNG
-                        </th>
-                      </>
-                    ) : (
-                      <>
-                        <th className="p-2 text-center min-w-[90px] bg-slate-100 text-slate-800 border-r border-slate-200">
-                          Số ngày có giờ
-                        </th>
-                        <th className="p-2 text-center min-w-[100px] bg-amber-100 text-amber-950 font-black">
-                          Tổng Giờ (h)
-                        </th>
-                      </>
-                    )}
+                    <th className="p-2 text-center min-w-[65px] bg-sky-100 text-sky-900 border-r border-slate-200">
+                      Công GĐ1
+                    </th>
+                    <th className="p-2 text-center min-w-[65px] bg-amber-100 text-amber-900 border-r border-slate-200">
+                      Công GĐ2
+                    </th>
+                    <th className="p-2 text-center min-w-[65px] bg-emerald-100 text-emerald-900 border-r border-slate-200">
+                      Công GĐ3
+                    </th>
+                    <th className="p-2 text-center min-w-[80px] bg-indigo-100 text-indigo-950 font-black">
+                      TỔNG CÔNG
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -766,116 +584,68 @@ export const NutellaTimesheetView: React.FC<NutellaTimesheetViewProps> = ({ onSw
                         {item.profileName}
                       </td>
                       {NUTELLA_DATES.map(date => {
-                        if (qaDisplayMode === 'workdays') {
-                          const val = item.dailyWorkdays[date];
-                          return (
-                            <td
-                              key={date}
-                              className="p-1 text-center font-mono text-2xs border-r border-slate-100"
-                            >
-                              {val === 1 ? (
-                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 font-bold">
-                                  1
-                                </span>
-                              ) : val === 0.5 ? (
-                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-amber-100 text-amber-800 font-bold">
-                                  0.5
-                                </span>
-                              ) : (
-                                <span className="text-slate-200">•</span>
-                              )}
-                            </td>
-                          );
-                        } else {
-                          const val = item.dailyHours[date];
-                          return (
-                            <td
-                              key={date}
-                              className="p-1 text-center font-mono text-2xs border-r border-slate-100"
-                            >
-                              {val ? (
-                                <span className="inline-block px-1 rounded bg-amber-50 text-amber-800 font-semibold">
-                                  {val.toFixed(1)}
-                                </span>
-                              ) : (
-                                <span className="text-slate-200">•</span>
-                              )}
-                            </td>
-                          );
-                        }
+                        const val = item.dailyWorkdays[date];
+                        return (
+                          <td
+                            key={date}
+                            className="p-1 text-center font-mono text-2xs border-r border-slate-100"
+                          >
+                            {val === 1 ? (
+                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-emerald-100 text-emerald-800 font-bold">
+                                1
+                              </span>
+                            ) : val === 0.5 ? (
+                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-amber-100 text-amber-800 font-bold">
+                                0.5
+                              </span>
+                            ) : (
+                              <span className="text-slate-200">•</span>
+                            )}
+                          </td>
+                        );
                       })}
-                      {qaDisplayMode === 'workdays' ? (
-                        <>
-                          <td className="p-2 text-center font-mono font-bold text-sky-800 bg-sky-50/40 border-r border-slate-100">
-                            {item.workdaysGD1}
-                          </td>
-                          <td className="p-2 text-center font-mono font-bold text-amber-800 bg-amber-50/40 border-r border-slate-100">
-                            {item.workdaysGD2}
-                          </td>
-                          <td className="p-2 text-center font-mono font-bold text-emerald-800 bg-emerald-50/40 border-r border-slate-100">
-                            {item.workdaysGD3}
-                          </td>
-                          <td className="p-2 text-center font-mono font-black text-indigo-700 bg-indigo-50/50">
-                            {item.totalWorkdays}
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="p-2 text-center font-mono font-bold text-slate-700 bg-slate-50/50 border-r border-slate-100">
-                            {item.activeDaysCount} ngày
-                          </td>
-                          <td className="p-2 text-center font-mono font-black text-amber-700 bg-amber-50/50">
-                            {item.totalHours.toFixed(2)}h
-                          </td>
-                        </>
-                      )}
+                      <td className="p-2 text-center font-mono font-bold text-sky-800 bg-sky-50/40 border-r border-slate-100">
+                        {item.workdaysGD1}
+                      </td>
+                      <td className="p-2 text-center font-mono font-bold text-amber-800 bg-amber-50/40 border-r border-slate-100">
+                        {item.workdaysGD2}
+                      </td>
+                      <td className="p-2 text-center font-mono font-bold text-emerald-800 bg-emerald-50/40 border-r border-slate-100">
+                        {item.workdaysGD3}
+                      </td>
+                      <td className="p-2 text-center font-mono font-black text-indigo-700 bg-indigo-50/50">
+                        {item.totalWorkdays}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot className="sticky bottom-0 bg-slate-900 text-white font-bold border-t-2 border-slate-700 z-10">
                   <tr>
                     <td colSpan={4} className="p-3 text-center uppercase tracking-wider text-xs">
-                      {qaDisplayMode === 'workdays' ? 'TỔNG CỘNG CÔNG QA' : 'TỔNG GIỜ QA THỰC TẾ'}
+                      TỔNG CỘNG CÔNG QA
                     </td>
                     {NUTELLA_DATES.map(date => {
                       const dayVal = QA_TIMESHEET_DATA.reduce((acc, cur) => {
-                        const v =
-                          qaDisplayMode === 'workdays'
-                            ? cur.dailyWorkdays[date] || 0
-                            : cur.dailyHours[date] || 0;
-                        return acc + v;
+                        return acc + (cur.dailyWorkdays[date] || 0);
                       }, 0);
                       return (
                         <td key={date} className="p-1 text-center font-mono text-2xs text-amber-300">
-                          {dayVal > 0 ? (qaDisplayMode === 'workdays' ? dayVal : dayVal.toFixed(0)) : '0'}
+                          {dayVal > 0 ? dayVal : '0'}
                         </td>
                       );
                     })}
-                    {qaDisplayMode === 'workdays' ? (
-                      <>
-                        <td className="p-2.5 text-center font-mono text-sky-300 bg-slate-800">
-                          {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD1}
-                        </td>
-                        <td className="p-2.5 text-center font-mono text-amber-300 bg-slate-800">
-                          {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD2}
-                        </td>
-                        <td className="p-2.5 text-center font-mono text-emerald-300 bg-slate-800">
-                          {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD3}
-                        </td>
-                        <td className="p-2.5 text-center font-mono text-base font-black text-white bg-indigo-600">
-                          {NUTELLA_TIMESHEET_SUMMARY.totalQAWorkdays}
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="p-2.5 text-center font-mono text-amber-300 bg-slate-800">
-                          77 ngày
-                        </td>
-                        <td className="p-2.5 text-center font-mono text-base font-black text-white bg-amber-600">
-                          {NUTELLA_TIMESHEET_SUMMARY.totalQARawHours.toFixed(2)}h
-                        </td>
-                      </>
-                    )}
+                    <td className="p-2.5 text-center font-mono text-sky-300 bg-slate-800">
+                      {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD1}
+                    </td>
+                    <td className="p-2.5 text-center font-mono text-amber-300 bg-slate-800">
+                      {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD2}
+                    </td>
+                    <td className="p-2.5 text-center font-mono text-emerald-300 bg-slate-800">
+                      {NUTELLA_TIMESHEET_SUMMARY.qaWorkdaysGD3}
+                    </td>
+                    <td className="p-2.5 text-center font-mono text-base font-black text-white bg-indigo-600">
+                      {NUTELLA_TIMESHEET_SUMMARY.totalQAWorkdays}
+                    </td>
                   </tr>
                 </tfoot>
               </table>

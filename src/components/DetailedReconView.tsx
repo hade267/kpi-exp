@@ -249,12 +249,24 @@ export const DetailedReconView: React.FC<DetailedReconViewProps> = ({
               Bảng dữ liệu sẽ tự động hiển thị lại ngay khi file đối soát mới được tích hợp.
             </p>
           </div>
-          <div className="pt-2">
+          <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
+            <a
+              id="btn-detailed-open-drive-ego"
+              href={DRIVE_LINKS.egoInspection}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors shadow-2xs cursor-pointer"
+            >
+              <FolderOpen className="w-4 h-4" />
+              <span>Mở Thư Mục Đối Soát EGO Trên Google Drive</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+            </a>
+
             {onSwitchSection && (
               <button
                 type="button"
                 onClick={() => onSwitchSection('consolidated_salary')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer"
               >
                 <span>Xem Bảng Lương Tổng Hợp 36 Nhân Sự</span>
                 <ArrowRight className="w-3.5 h-3.5" />

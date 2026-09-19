@@ -288,27 +288,18 @@ export const Header: React.FC<HeaderProps> = ({
               Bảng 27 Nhân Sự
             </button>
 
-            <button
-              id="tab-btn-detailed"
-              onClick={() => setActiveTab('detailed')}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
-                activeTab === 'detailed'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
+            <a
+              id="tab-link-detailed-drive"
+              href={DRIVE_LINKS.egoInspection}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap text-indigo-700 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200/80 shadow-2xs cursor-pointer"
+              title="Mở thư mục Google Drive: Chi Tiết Đối Soát Từng Bài"
             >
-              <ListFilter className="w-4 h-4" />
-              <span>Đối Soát Chi Tiết</span>
-              <span
-                className={`text-3xs px-2 py-0.5 rounded-full font-bold ${
-                  activeTab === 'detailed'
-                    ? 'bg-amber-400 text-slate-950'
-                    : 'bg-amber-100 text-amber-800 border border-amber-300'
-                }`}
-              >
-                Đang cập nhật lại
-              </span>
-            </button>
+              <FolderOpen className="w-4 h-4 text-indigo-600" />
+              <span>Chi Tiết Đối Soát Từng Bài (Drive)</span>
+              <ExternalLink className="w-3.5 h-3.5 text-indigo-400" />
+            </a>
 
             <button
               id="tab-btn-analytics"
